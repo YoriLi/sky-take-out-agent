@@ -16,6 +16,17 @@ sudo apt-get update -qq
 # not support newer JDKs. The compiled jar runs fine on the image default JDK.
 sudo apt-get install -y -qq mysql-server redis-server maven openjdk-11-jdk
 
+echo "==> Configuring InnoDB flush method for snapshot-restored overlay FS"
+# Cloud Agent environment builds restore the MySQL datadir onto a lazily-loaded
+# overlay filesystem where InnoDB's default O_DIRECT I/O fails with EINVAL
+# (OS error 22), so mysqld cannot start from the snapshot. Using fsync avoids
+# O_DIRECT and lets MySQL start reliably from the restored datadir.
+sudo mkdir -p /etc/mysql/mysql.conf.d
+sudo tee /etc/mysql/mysql.conf.d/zz-cloud-agent.cnf >/dev/null <<'CNF'
+[mysqld]
+innodb_flush_method = fsync
+CNF
+
 echo "==> Starting MySQL + Redis (needed to seed the schema during install)"
 # Reuse the robust, poll-based service startup so a cold snapshot-restored
 # disk cannot trip the init script's fixed 30s timeout.
