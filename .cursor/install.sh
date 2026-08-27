@@ -49,6 +49,8 @@ export NVM_DIR="$HOME/.nvm"
 . "$NVM_DIR/nvm.sh"
 nvm install "$NODE_MAJOR" >/dev/null
 nvm use "$NODE_MAJOR" >/dev/null
+# Pin Node 14 on PATH so npm resolves to it regardless of other shims.
+export PATH="$(dirname "$(nvm which "$NODE_MAJOR")"):$PATH"
 (
   cd project-rjwm-admin-vue-ts
   # fibers is an unused, optional native accelerator that fails to compile on
