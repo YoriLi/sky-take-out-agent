@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * 老板 AI 助手 SSE 入口。只做参数校验与建连，零 AI 逻辑。
@@ -63,17 +64,22 @@ public class AgentController {
             return emitter;
         }
 
-        agentExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    agentChatService.chat(body, empId, sink);
-                } catch (Exception e) {
-                    log.error("[agent] stream worker failed empId={}", empId, e);
-                    sink.error("助手暂时不可用，请稍后重试");
+        try {
+            agentExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        agentChatService.chat(body, empId, sink);
+                    } catch (Exception e) {
+                        log.error("[agent] stream worker failed empId={}", empId, e);
+                        sink.error("助手暂时不可用，请稍后重试");
+                    }
                 }
-            }
-        });
+            });
+        } catch (RejectedExecutionException e) {
+            log.warn("[agent] executor saturated, reject empId={}", empId);
+            sink.error("助手繁忙，请稍后再试");
+        }
         return emitter;
     }
 }

@@ -60,6 +60,9 @@ public class AgentChatService {
     @Autowired
     private ShopService shopService;
 
+    @Autowired
+    private AgentRateLimiter rateLimiter;
+
     private volatile OpenAiStreamingChatModel streamingModel;
 
     public void chat(AgentChatRequest request, Long empId, AgentEventSink sink) {
@@ -75,6 +78,13 @@ public class AgentChatService {
         String message = request.getMessage().trim();
         if (message.length() > MAX_MESSAGE_LENGTH) {
             sink.error("输入过长，请精简后重试（上限 " + MAX_MESSAGE_LENGTH + " 字）");
+            return;
+        }
+
+        int limitPerMinute = properties.getRateLimitPerMinute() == null ? 20 : properties.getRateLimitPerMinute();
+        if (!rateLimiter.tryAcquire(empId, limitPerMinute)) {
+            log.warn("[agent] rate limited empId={}", empId);
+            sink.error("操作过于频繁，请稍后再试");
             return;
         }
 

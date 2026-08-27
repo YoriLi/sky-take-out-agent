@@ -73,3 +73,4 @@ sky:
     model: ${SKY_AGENT_MODEL:deepseek-chat}
     timeout-seconds: ${SKY_AGENT_TIMEOUT:120}
     memory-max-messages: ${SKY_AGENT_MEMORY_MAX:20}
+    rate-limit-per-minute: ${SKY_AGENT_RATE_LIMIT:20}
