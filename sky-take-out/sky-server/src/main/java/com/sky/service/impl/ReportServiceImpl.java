@@ -7,8 +7,6 @@ import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.service.WorkspaceService;
 import com.sky.vo.*;
-import dev.langchain4j.agent.tool.P;
-import dev.langchain4j.agent.tool.Tool;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -51,8 +49,7 @@ public class ReportServiceImpl implements ReportService {
      * @return
      */
     @Override
-    @Tool(name = "getTurnoverReport", value = "按日期区间查询营业额报表。日期格式 yyyy-MM-dd。用户问营业额、营收趋势时使用。")
-    public TurnoverReportVO getTurnover(@P("开始日期") LocalDate begin, @P("结束日期") LocalDate end) {
+    public TurnoverReportVO getTurnover(LocalDate begin, LocalDate end) {
         List<LocalDate> dateList = new ArrayList<>();
         dateList.add(begin);
 
@@ -91,8 +88,7 @@ public class ReportServiceImpl implements ReportService {
      * @return
      */
     @Override
-    @Tool(name = "getUserReport", value = "按日期区间查询用户统计（总量与新增）。日期格式 yyyy-MM-dd。")
-    public UserReportVO getUserStatistics(@P("开始日期") LocalDate begin, @P("结束日期") LocalDate end) {
+    public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
         ArrayList<LocalDate> dateList = new ArrayList<>();
         dateList.add(begin);
 
@@ -130,8 +126,7 @@ public class ReportServiceImpl implements ReportService {
      * @return
      */
     @Override
-    @Tool(name = "getOrderReport", value = "按日期区间查询订单统计（总数、有效订单、完成率）。日期格式 yyyy-MM-dd。")
-    public OrderReportVO getOrderStatistics(@P("开始日期") LocalDate begin, @P("结束日期") LocalDate end) {
+    public OrderReportVO getOrderStatistics(LocalDate begin, LocalDate end) {
         ArrayList<LocalDate> dateList = new ArrayList<>();
         dateList.add(begin);
 
@@ -191,8 +186,7 @@ public class ReportServiceImpl implements ReportService {
      * @return
      */
     @Override
-    @Tool(name = "getSalesTop10", value = "查询指定区间销量 Top10 菜品/套餐。日期格式 yyyy-MM-dd。用户问热销、排行时使用。")
-    public SalesTop10ReportVO getSalesTop10(@P("开始日期") LocalDate begin, @P("结束日期") LocalDate end) {
+    public SalesTop10ReportVO getSalesTop10(LocalDate begin, LocalDate end) {
         LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
         LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
 

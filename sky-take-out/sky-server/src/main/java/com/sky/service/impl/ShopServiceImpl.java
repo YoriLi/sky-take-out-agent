@@ -3,8 +3,6 @@ package com.sky.service.impl;
 import com.sky.constant.MessageConstant;
 import com.sky.exception.BaseException;
 import com.sky.service.ShopService;
-import dev.langchain4j.agent.tool.P;
-import dev.langchain4j.agent.tool.Tool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,7 +24,6 @@ public class ShopServiceImpl implements ShopService {
     private RedisTemplate redisTemplate;
 
     @Override
-    @Tool(name = "getShopStatus", value = "查询店铺当前营业状态。1 表示营业中，0 表示打烊。用户问现在开店了吗、营业吗时使用。")
     public Integer getStatus() {
         Integer status = readStatusFromRedis();
         if (status != null) {
@@ -47,8 +44,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    @Tool(name = "setShopStatus", value = "设置店铺营业状态。只接受 0（打烊）或 1（营业）。用户明确要求开业或打烊时使用。")
-    public void setStatus(@P("营业状态，只能是 0 或 1") Integer status) {
+    public void setStatus(Integer status) {
         if (status == null || (status != 0 && status != 1)) {
             throw new BaseException(MessageConstant.UNKNOWN_ERROR);
         }
