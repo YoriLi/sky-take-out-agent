@@ -9,9 +9,11 @@ import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
+import com.sky.exception.PasswordEditFailedException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
@@ -174,6 +176,39 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setUpdateTime(LocalDateTime.now());
         employee.setUpdateUser(BaseContext.getCurrentId());
         employeeMapper.update(employee);
+    }
+
+    /**
+     * 修改当前登录员工的密码。empId 一律取自登录态，忽略前端传入的 empId，避免越权改他人密码。
+     */
+    @Override
+    public void editPassword(PasswordEditDTO passwordEditDTO) {
+        Long empId = BaseContext.getCurrentId();
+        if (empId == null) {
+            throw new PasswordEditFailedException(MessageConstant.PASSWORD_EDIT_FAILED);
+        }
+
+        Employee employee = employeeMapper.getById(empId);
+        if (employee == null) {
+            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        }
+
+        // 校验旧密码（兼容 BCrypt/遗留 MD5/明文，匹配成功会顺带升级为 BCrypt）
+        if (!matchesAndUpgradePassword(passwordEditDTO.getOldPassword(), employee)) {
+            throw new PasswordEditFailedException(MessageConstant.PASSWORD_ERROR);
+        }
+
+        String newPassword = passwordEditDTO.getNewPassword();
+        if (newPassword == null || newPassword.trim().length() < 6) {
+            throw new PasswordEditFailedException("新密码长度不能少于6位");
+        }
+
+        Employee update = Employee.builder()
+                .id(empId)
+                .password(passwordEncoder.encode(newPassword))
+                .updateTime(LocalDateTime.now())
+                .build();
+        employeeMapper.update(update);
     }
 
 }

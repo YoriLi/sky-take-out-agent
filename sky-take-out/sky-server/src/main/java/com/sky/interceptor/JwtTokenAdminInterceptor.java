@@ -1,7 +1,10 @@
 package com.sky.interceptor;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
+import com.sky.entity.Employee;
+import com.sky.mapper.EmployeeMapper;
 import com.sky.properties.JwtProperties;
 import com.sky.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -22,6 +25,9 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtProperties jwtProperties;
 
+    @Autowired
+    private EmployeeMapper employeeMapper;
+
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (!(handler instanceof HandlerMethod)) {
             return true;
@@ -31,6 +37,15 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             log.info("jwt校验: admin token present={}", token != null && !token.isEmpty());
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
+
+            // 每次请求复核账号状态：被禁用的员工，其未过期令牌应立即失效
+            Employee employee = employeeMapper.getById(empId);
+            if (employee == null || StatusConstant.DISABLE.equals(employee.getStatus())) {
+                log.warn("账号不存在或已被禁用，拒绝访问 empId={}", empId);
+                response.setStatus(401);
+                return false;
+            }
+
             log.info("当前员工id：{}", empId);
             BaseContext.setCurrentId(empId);
             return true;
