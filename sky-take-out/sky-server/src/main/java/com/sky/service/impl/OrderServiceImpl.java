@@ -107,11 +107,16 @@ public class OrderServiceImpl implements OrderService {
         order.setPhone(addressBook.getPhone());
         order.setAddress(addressBook.getDetail());
         order.setConsignee(addressBook.getConsignee());
-        order.setNumber(String.valueOf(System.currentTimeMillis()));
+        order.setNumber(generateOrderNumber());
         order.setUserId(currentId);
         order.setStatus(Orders.PENDING_PAYMENT);
         order.setPayStatus(Orders.UN_PAID);
         order.setOrderTime(LocalDateTime.now());
+
+        // 金额必须由服务端按购物车重算，禁止信任客户端提交的 amount（防价格篡改）
+        int packAmount = order.getPackAmount();
+        order.setAmount(calculateOrderAmount(shoppingCartList, packAmount));
+
         orderMapper.insert(order);
 
 //        订单明细数据
@@ -151,6 +156,9 @@ public class OrderServiceImpl implements OrderService {
 
         String orderNumber = ordersPaymentDTO.getOrderNumber();
         Orders orders = orderMapper.getByNumberAndUserId(orderNumber, userId);
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
 
 //        调用微信支付接口，生成预支付交易单
         JSONObject jsonObject = weChatPayUtil.pay(
@@ -182,6 +190,11 @@ public class OrderServiceImpl implements OrderService {
         }
         // 幂等：已支付则直接返回
         if (Orders.PAID.equals(orderDB.getPayStatus())) {
+            return;
+        }
+        // 仅允许待付款订单转为已支付，防止异常状态被回调改写
+        if (!Orders.PENDING_PAYMENT.equals(orderDB.getStatus())) {
+            log.warn("支付回调订单状态非待付款，忽略。number={} status={}", outTradeNo, orderDB.getStatus());
             return;
         }
 
@@ -502,6 +515,31 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 服务端按购物车明细重算订单金额：Σ(单价 × 数量) + 打包费。
+     * 单价取自购物车（加购时由服务端从菜品/套餐写入），不信任客户端提交的 amount。
+     */
+    private BigDecimal calculateOrderAmount(List<ShoppingCart> shoppingCartList, int packAmount) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (ShoppingCart cart : shoppingCartList) {
+            BigDecimal price = cart.getAmount() == null ? BigDecimal.ZERO : cart.getAmount();
+            int number = cart.getNumber() == null ? 0 : cart.getNumber();
+            total = total.add(price.multiply(BigDecimal.valueOf(number)));
+        }
+        if (packAmount > 0) {
+            total = total.add(BigDecimal.valueOf(packAmount));
+        }
+        return total;
+    }
+
+    /**
+     * 生成订单号：时间戳 + 4 位随机数，避免同一毫秒并发下单撞唯一索引，同时降低可预测性。
+     */
+    private String generateOrderNumber() {
+        int rnd = java.util.concurrent.ThreadLocalRandom.current().nextInt(1000, 10000);
+        return System.currentTimeMillis() + String.valueOf(rnd);
+    }
+
+    /**
      * 校验订单归属当前登录用户
      */
     private Orders getOrderOwnedByCurrentUser(Long id) {
@@ -567,6 +605,12 @@ public class OrderServiceImpl implements OrderService {
      * @param address
      */
     private void checkOutOfRange(String address) {
+        // 未配置百度地图 AK 时跳过配送范围校验，保证单店在无地图密钥时仍可正常下单
+        if (ak == null || ak.trim().isEmpty()) {
+            log.warn("未配置 sky.baidu.ak，跳过配送范围校验");
+            return;
+        }
+
         HashMap map = new HashMap();
         map.put("address", shopAddress);
         map.put("output", "json");
@@ -594,7 +638,11 @@ public class OrderServiceImpl implements OrderService {
         String userCoordinate = HttpClientUtil.doGet("https://api.map.baidu.com/geocoding/v3", map);
 
 //        数据解析
-        location = JSON.parseObject("result").getJSONObject("location");
+        jsonObject = JSON.parseObject(userCoordinate);
+        if (!"0".equals(jsonObject.getString("status"))) {
+            throw new OrderBusinessException("用户地址解析失败");
+        }
+        location = jsonObject.getJSONObject("result").getJSONObject("location");
         lat = location.getString("lat");
         lng = location.getString("lng");
 
