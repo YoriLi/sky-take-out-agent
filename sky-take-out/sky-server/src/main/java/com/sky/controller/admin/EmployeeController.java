@@ -12,6 +12,7 @@ import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
+import com.sky.vo.EmployeeVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -125,10 +126,10 @@ public class EmployeeController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "根据iD查询用户信息")
-    public Result<Employee> getById(@PathVariable Long id) {
+    public Result<EmployeeVO> getById(@PathVariable Long id) {
         log.info("根据iD查询用户信息：{}", id);
-        Employee employee = employeeService.getById(id);
-        return Result.success(employee);
+        EmployeeVO employeeVO = employeeService.getById(id);
+        return Result.success(employeeVO);
     }
 
     /**

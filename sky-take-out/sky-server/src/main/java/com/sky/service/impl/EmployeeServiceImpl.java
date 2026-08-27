@@ -18,6 +18,7 @@ import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
+import com.sky.vo.EmployeeVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,7 @@ import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -129,10 +131,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         long total = page.getTotal();
         List<Employee> records = page.getResult();
-        // 列表接口脱敏，避免把哈希返回给前端
-        records.forEach(e -> e.setPassword("****"));
+        // 列表接口用 VO 承载（结构上无 password），并对手机号/身份证号脱敏
+        List<EmployeeVO> voList = records.stream().map(this::toMaskedVO).collect(Collectors.toList());
 
-        return new PageResult(total, records);
+        return new PageResult(total, voList);
     }
 
     /**
@@ -155,13 +157,54 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @return
      */
     @Override
-    public Employee getById(Long id) {
+    public EmployeeVO getById(Long id) {
         Employee employee = employeeMapper.getById(id);
         if (employee == null) {
             throw new AccountNotFoundException(MessageConstant.EMPLOYEE_NOT_FOUND);
         }
-        employee.setPassword("****");
-        return employee;
+        // 详情用于编辑回填，保留手机号/身份证原值，但结构上不含 password
+        return toVO(employee);
+    }
+
+    /**
+     * Employee → EmployeeVO（不含 password）。
+     */
+    private EmployeeVO toVO(Employee e) {
+        EmployeeVO vo = new EmployeeVO();
+        BeanUtils.copyProperties(e, vo);
+        return vo;
+    }
+
+    /**
+     * 列表展示用 VO：对手机号、身份证号做脱敏。
+     */
+    private EmployeeVO toMaskedVO(Employee e) {
+        EmployeeVO vo = toVO(e);
+        vo.setPhone(maskTail(e.getPhone(), 4));
+        vo.setIdNumber(maskTail(e.getIdNumber(), 4));
+        return vo;
+    }
+
+    /**
+     * 保留末 keepTail 位，其余以 * 遮蔽；长度不足时整体遮蔽。
+     */
+    private String maskTail(String value, int keepTail) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        int len = value.length();
+        if (len <= keepTail) {
+            return repeat('*', len);
+        }
+        return repeat('*', len - keepTail) + value.substring(len - keepTail);
+    }
+
+    private String repeat(char c, int n) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            sb.append(c);
+        }
+        return sb.toString();
     }
 
     /**
