@@ -2,6 +2,7 @@ package com.sky.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;// 导入 OpenAPI 3 中用于描述"模型"和"字段"的注解
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -19,6 +20,7 @@ public class EmployeeLoginDTO implements Serializable {
     private String username;
 
     @Schema(description = "密码")
+    @ToString.Exclude
     private String password;
 
 }
