@@ -1,0 +1,16 @@
+{
+  "name": "Sky Take-out (苍穹外卖) full stack",
+  "install": "./.cursor/install.sh",
+  "start": "./.cursor/start.sh",
+  "terminals": [
+    {
+      "name": "backend (Spring Boot :8080)",
+      "command": "cd sky-take-out && java -jar sky-server/target/sky-server-1.0-SNAPSHOT.jar"
+    },
+    {
+      "name": "frontend (Vue dev server :8081)",
+      "command": "export NVM_DIR=\"$HOME/.nvm\"; . \"$NVM_DIR/nvm.sh\"; nvm use 14 >/dev/null; export PATH=\"$(dirname \"$(nvm which 14)\"):$PATH\"; cd project-rjwm-admin-vue-ts && npm run serve"
+    }
+  ],
+  "ports": [8080, 8081]
+}
