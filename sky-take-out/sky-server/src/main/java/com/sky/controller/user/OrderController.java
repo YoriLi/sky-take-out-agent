@@ -48,9 +48,9 @@ public class OrderController {
     @PutMapping("/payment")
     @Operation(summary = "订单支付")
     public Result<OrderPaymentVO> payment(@RequestBody OrdersPaymentDTO ordersPaymentDTO) throws Exception {
-        log.info("订单支付：{}", ordersPaymentDTO);
+        log.info("订单支付，订单号：{}", ordersPaymentDTO.getOrderNumber());
         OrderPaymentVO orderPaymentVO = orderService.payment(ordersPaymentDTO);
-        log.info("生成预支付交易单：{}", orderPaymentVO);
+        log.info("已生成预支付交易单，订单号：{}", ordersPaymentDTO.getOrderNumber());
         return Result.success(orderPaymentVO);
     }
 

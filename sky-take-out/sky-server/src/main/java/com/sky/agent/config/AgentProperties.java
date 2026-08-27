@@ -25,4 +25,9 @@ public class AgentProperties {
     private Integer timeoutSeconds = 120;
 
     private Integer memoryMaxMessages = 20;
+
+    /**
+     * 单个员工每分钟允许的对话次数上限，防止刷接口耗尽模型 Token 配额。
+     */
+    private Integer rateLimitPerMinute = 20;
 }

@@ -22,8 +22,6 @@ import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import com.sky.websocket.WebSocketServer;
-import dev.langchain4j.agent.tool.P;
-import dev.langchain4j.agent.tool.Tool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,11 +105,16 @@ public class OrderServiceImpl implements OrderService {
         order.setPhone(addressBook.getPhone());
         order.setAddress(addressBook.getDetail());
         order.setConsignee(addressBook.getConsignee());
-        order.setNumber(String.valueOf(System.currentTimeMillis()));
+        order.setNumber(generateOrderNumber());
         order.setUserId(currentId);
         order.setStatus(Orders.PENDING_PAYMENT);
         order.setPayStatus(Orders.UN_PAID);
         order.setOrderTime(LocalDateTime.now());
+
+        // 金额必须由服务端按购物车重算，禁止信任客户端提交的 amount（防价格篡改）
+        int packAmount = order.getPackAmount();
+        order.setAmount(calculateOrderAmount(shoppingCartList, packAmount));
+
         orderMapper.insert(order);
 
 //        订单明细数据
@@ -151,6 +154,9 @@ public class OrderServiceImpl implements OrderService {
 
         String orderNumber = ordersPaymentDTO.getOrderNumber();
         Orders orders = orderMapper.getByNumberAndUserId(orderNumber, userId);
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
 
 //        调用微信支付接口，生成预支付交易单
         JSONObject jsonObject = weChatPayUtil.pay(
@@ -182,6 +188,11 @@ public class OrderServiceImpl implements OrderService {
         }
         // 幂等：已支付则直接返回
         if (Orders.PAID.equals(orderDB.getPayStatus())) {
+            return;
+        }
+        // 仅允许待付款订单转为已支付，防止异常状态被回调改写
+        if (!Orders.PENDING_PAYMENT.equals(orderDB.getStatus())) {
+            log.warn("支付回调订单状态非待付款，忽略。number={} status={}", outTradeNo, orderDB.getStatus());
             return;
         }
 
@@ -247,8 +258,7 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     @Override
-    @Tool(name = "getOrderDetail", value = "按订单内部 id 查询订单详情，含菜品明细。用户要看某一笔订单的具体内容时使用。")
-    public OrderVO details(@P("订单内部 id，必填") Long id) {
+    public OrderVO details(Long id) {
         Orders orders = orderMapper.getById(id);
         if (orders == null) {
             throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
@@ -325,8 +335,7 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     @Override
-    @Tool(name = "searchOrders", value = "按订单号/手机号/状态分页查询订单。用户想找某笔或某类订单时使用。不要编造订单号。page 默认 1，pageSize 建议 10。status：1待付款 2待接单 3已接单 4派送中 5已完成 6已取消。")
-    public PageResult conditionSearch(@P("查询条件，字段：page, pageSize, number(订单号可空), phone(手机号可空), status(1-6可空)") OrdersPageQueryDTO ordersPageQueryDTO) {
+    public PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO) {
         PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
 
         Page<Orders> pageQuery = orderMapper.pageQuery(ordersPageQueryDTO);
@@ -341,7 +350,6 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     @Override
-    @Tool(name = "countOrdersByStatus", value = "统计当前待接单、已接单、派送中的订单数量。用户问积压、待处理订单时使用。")
     public OrderStatisticsVO statistics() {
 //        根据状态，分别查询出接待单，待派送、派送中的订单数量
         Integer toBeConfirmed = orderMapper.countStatus(Orders.TO_BE_CONFIRMED);
@@ -362,8 +370,13 @@ public class OrderServiceImpl implements OrderService {
      * @param ordersCancelDTO
      */
     @Override
-    @Tool(name = "confirmOrder", value = "商家接单。仅在用户明确给出订单 id 时调用，禁止臆造 id。一般只传 id。")
-    public void confirm(@P("接单数据，只需设置 id") OrdersConfirmDTO ordersConfirmDTO) {
+    public void confirm(OrdersConfirmDTO ordersConfirmDTO) {
+        // 校验订单存在且处于待接单状态，防止把已完成/已取消等订单错误改写
+        Orders orderDB = orderMapper.getById(ordersConfirmDTO.getId());
+        if (orderDB == null || !Orders.TO_BE_CONFIRMED.equals(orderDB.getStatus())) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
         Orders orders = Orders.builder()
                 .id(ordersConfirmDTO.getId())
                 .status(Orders.CONFIRMED)
@@ -376,8 +389,7 @@ public class OrderServiceImpl implements OrderService {
      * @param ordersRejectionDTO
      */
     @Override
-    @Tool(name = "rejectOrder", value = "商家拒单。必须同时提供订单 id 和拒绝原因，没有原因时不要调用，应先追问。")
-    public void rejection(@P("拒单数据：id 必填，rejectionReason 必填") OrdersRejectionDTO ordersRejectionDTO) throws Exception {
+    public void rejection(OrdersRejectionDTO ordersRejectionDTO) throws Exception {
 //        根据id查询订单
         Orders ordersDB = orderMapper.getById(ordersRejectionDTO.getId());
 
@@ -414,14 +426,26 @@ public class OrderServiceImpl implements OrderService {
      * @param ordersCancelDTO
      */
     @Override
-    @Tool(name = "cancelOrder", value = "商家取消订单。必须同时提供订单 id 和取消原因，没有原因时不要调用，应先追问。")
-    public void cancel(@P("取消数据：id 必填，cancelReason 必填") OrdersCancelDTO ordersCancelDTO) throws Exception {
+    public void cancel(OrdersCancelDTO ordersCancelDTO) throws Exception {
 //        根据id查询订单
         Orders orderDB = orderMapper.getById(ordersCancelDTO.getId());
 
+//        校验订单存在
+        if (orderDB == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+//        已完成/已取消的订单不允许再取消
+        if (Orders.COMPLETED.equals(orderDB.getStatus()) || Orders.CANCELLED.equals(orderDB.getStatus())) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+//        取消必须带原因
+        if (ordersCancelDTO.getCancelReason() == null || ordersCancelDTO.getCancelReason().trim().isEmpty()) {
+            throw new OrderBusinessException("取消订单必须填写取消原因");
+        }
+
 //        支付状态
         Integer payStatus = orderDB.getPayStatus();
-        if (payStatus == 1) {
+        if (Orders.PAID.equals(payStatus)) {
 //            用于已支付，需要退款
             String refund = weChatPayUtil.refund(
                     orderDB.getNumber(),
@@ -446,8 +470,7 @@ public class OrderServiceImpl implements OrderService {
      * @param id
      */
     @Override
-    @Tool(name = "deliverOrder", value = "将已接单的订单改为派送中。需要订单内部 id。")
-    public void delivery(@P("订单内部 id，必填") Long id) {
+    public void delivery(Long id) {
 //        根据id查询订单
         Orders orderDB = orderMapper.getById(id);
 
@@ -470,8 +493,7 @@ public class OrderServiceImpl implements OrderService {
      * @param id
      */
     @Override
-    @Tool(name = "completeOrder", value = "将派送中的订单标记为已完成。需要订单内部 id。")
-    public void complete(@P("订单内部 id，必填") Long id) {
+    public void complete(Long id) {
         Orders orderDB = orderMapper.getById(id);
 
         if (orderDB == null || !orderDB.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)) {
@@ -499,6 +521,31 @@ public class OrderServiceImpl implements OrderService {
         map.put("orderId", id);
         map.put("content", "订单号：" + orders.getNumber());
         webSocketServer.sendToAllClient(JSON.toJSONString(map));
+    }
+
+    /**
+     * 服务端按购物车明细重算订单金额：Σ(单价 × 数量) + 打包费。
+     * 单价取自购物车（加购时由服务端从菜品/套餐写入），不信任客户端提交的 amount。
+     */
+    private BigDecimal calculateOrderAmount(List<ShoppingCart> shoppingCartList, int packAmount) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (ShoppingCart cart : shoppingCartList) {
+            BigDecimal price = cart.getAmount() == null ? BigDecimal.ZERO : cart.getAmount();
+            int number = cart.getNumber() == null ? 0 : cart.getNumber();
+            total = total.add(price.multiply(BigDecimal.valueOf(number)));
+        }
+        if (packAmount > 0) {
+            total = total.add(BigDecimal.valueOf(packAmount));
+        }
+        return total;
+    }
+
+    /**
+     * 生成订单号：时间戳 + 4 位随机数，避免同一毫秒并发下单撞唯一索引，同时降低可预测性。
+     */
+    private String generateOrderNumber() {
+        int rnd = java.util.concurrent.ThreadLocalRandom.current().nextInt(1000, 10000);
+        return System.currentTimeMillis() + String.valueOf(rnd);
     }
 
     /**
@@ -567,6 +614,12 @@ public class OrderServiceImpl implements OrderService {
      * @param address
      */
     private void checkOutOfRange(String address) {
+        // 未配置百度地图 AK 时跳过配送范围校验，保证单店在无地图密钥时仍可正常下单
+        if (ak == null || ak.trim().isEmpty()) {
+            log.warn("未配置 sky.baidu.ak，跳过配送范围校验");
+            return;
+        }
+
         HashMap map = new HashMap();
         map.put("address", shopAddress);
         map.put("output", "json");
@@ -594,7 +647,11 @@ public class OrderServiceImpl implements OrderService {
         String userCoordinate = HttpClientUtil.doGet("https://api.map.baidu.com/geocoding/v3", map);
 
 //        数据解析
-        location = JSON.parseObject("result").getJSONObject("location");
+        jsonObject = JSON.parseObject(userCoordinate);
+        if (!"0".equals(jsonObject.getString("status"))) {
+            throw new OrderBusinessException("用户地址解析失败");
+        }
+        location = jsonObject.getJSONObject("result").getJSONObject("location");
         lat = location.getString("lat");
         lng = location.getString("lng");
 
