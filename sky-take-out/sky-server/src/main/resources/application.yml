@@ -1,0 +1,75 @@
+server:
+  port: 8080
+  # 给Tomcat服务器设置监听 8080 端口
+spring:
+  profiles:
+    active: dev
+    # 激活名为 'dev' 的配置文件（即加载 application-dev.yml）
+  main:
+    allow-circular-references: true
+    # 允许 Bean 之间的循环依赖（比如 A依赖B，B依赖A）。
+  datasource:
+    druid: # 使用阿里巴巴的 Druid 数据库连接池（自带监控页面）
+      driver-class-name: ${sky.datasource.driver-class-name}
+      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${sky.datasource.username} # 数据库登录名
+      password: ${sky.datasource.password} # 数据库登录名
+  redis:
+    host: ${sky.redis.host} # Redis 服务器地址
+    port: ${sky.redis.port} # Redis 端口（默认6379）
+    password: ${sky.redis.password} # Redis 访问密码（没有则为空）
+    database: ${sky.redis.database} # 指定使用 Redis 的第几个库（默认0-15）
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml  # 指定 XML 映射文件存放路径（在 resources/mapper 下）
+  type-aliases-package: com.sky.entity  #给实体类起别名，这样在 XML 中不用写全类名
+  configuration:
+    #开启驼峰命名：数据库字段 user_name 自动映射为 Java 实体类属性 userName
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com:
+      sky:
+        mapper: debug # 打印 Mapper 层执行的 SQL 语句（方便调试看SQL）
+        service: info # 业务层只打印 info 及以上级别（不打印琐碎的debug日志）
+        controller: info  # 控制层只打印 info 级别
+
+sky:
+  jwt:
+    # 通过环境变量注入；本地默认值仅用于开发，生产必须覆盖
+    admin-secret-key: ${SKY_JWT_ADMIN_SECRET:sky-admin-dev-secret-change-me-32b}
+    admin-ttl: ${SKY_JWT_ADMIN_TTL:7200000}
+    admin-token-name: token
+    user-secret-key: ${SKY_JWT_USER_SECRET:sky-user-dev-secret-change-me-32b}
+    user-ttl: ${SKY_JWT_USER_TTL:7200000}
+    user-token-name: authentication
+  alioss:
+    endpoint: ${sky.alioss.endpoint}
+    access-key-id: ${sky.alioss.access-key-id}
+    access-key-secret: ${sky.alioss.access-key-secret}
+    bucket-name: ${sky.alioss.bucket-name}
+  wechat:
+    appid: ${sky.wechat.appid}
+    secret: ${sky.wechat.secret}
+    mchid: ${sky.wechat.mchid}
+    mchSerialNo: ${sky.wechat.mchSerialNo}
+    privateKeyFilePath: ${sky.wechat.privateKeyFilePath}
+    apiV3Key: ${sky.wechat.apiV3Key}
+    weChatPayCertFilePath: ${sky.wechat.weChatPayCertFilePath}
+    notifyUrl: ${sky.wechat.notifyUrl}
+    refundNotifyUrl: ${sky.wechat.refundNotifyUrl}
+  shop:
+    address: ${SKY_SHOP_ADDRESS:湖北省武汉市洪山区徐东大街18号}
+  baidu:
+    ak: ${SKY_BAIDU_AK:}
+  upload:
+    max-size-bytes: ${SKY_UPLOAD_MAX_SIZE:5242880}
+    allowed-extensions: jpg,jpeg,png,gif,webp
+  agent:
+    api-key: ${SKY_AGENT_API_KEY:}
+    base-url: ${SKY_AGENT_BASE_URL:https://api.deepseek.com}
+    model: ${SKY_AGENT_MODEL:deepseek-chat}
+    timeout-seconds: ${SKY_AGENT_TIMEOUT:120}
+    memory-max-messages: ${SKY_AGENT_MEMORY_MAX:20}

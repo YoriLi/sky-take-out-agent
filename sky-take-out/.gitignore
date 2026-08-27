@@ -1,0 +1,11 @@
+**/target/
+.idea
+*.iml
+*.class
+*Test.java
+**/test/
+# Keep secrets out of VCS; use application-dev.yml.example as template
+sky-server/src/main/resources/application-dev.yml
+*.pem
+.env
+.env.*

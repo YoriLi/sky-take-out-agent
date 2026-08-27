@@ -1,0 +1,5514 @@
+[
+  {
+    "id": "DOC-01",
+    "name": "Swagger UI 可访问",
+    "nature": "冒烟",
+    "method": "GET",
+    "endpoint": "/swagger-ui/index.html",
+    "request_data": null,
+    "boundary": "文档入口应 200",
+    "expected": "HTTP 200",
+    "http_status": 200,
+    "response": "<!-- HTML for static distribution bundle build -->\n<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\">\n    <title>Swagger UI</title>\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"./swagger-ui.css\" />\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"index.css\" />\n    <link rel=\"icon\" type=\"image/png\" href=\"./favicon-32x32.png\" sizes=\"32x32\" />\n    <link rel=\"icon\" type=\"image/png\" href=\"./favicon-16x16.png\" sizes=\"16x16\" />\n  </head>\n\n  <body>\n    <div id=\"swagger-ui\"></div>\n    <script src=\"./swagger-ui-bundle.js\" charset=\"UTF-8\"> </script>\n    <script src=\"./swagger-ui-standalone-preset.js\" charset=\"UTF-8\"> </script>\n    <script src=\"./swagger-initializer.js\" charset=\"UTF-8\"> </script>\n  </body>\n</html>\n",
+    "elapsed_ms": 70,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "DOC-02",
+    "name": "管理端 OpenAPI JSON",
+    "nature": "冒烟",
+    "method": "GET",
+    "endpoint": "/v3/api-docs/管理端接口",
+    "request_data": null,
+    "boundary": "应返回 paths",
+    "expected": "HTTP 200 且含 paths",
+    "http_status": 200,
+    "response": {
+      "openapi": "3.0.1",
+      "info": {
+        "title": "苍穹外卖项目接口文档",
+        "description": "苍穹外卖项目接口文档",
+        "version": "2.0"
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8080",
+          "description": "Generated server url"
+        }
+      ],
+      "security": [
+        {
+          "adminToken": []
+        }
+      ],
+      "paths": {
+        "/admin/shop/{status}": {
+          "put": {
+            "tags": [
+              "店铺相关接口"
+            ],
+            "summary": "设置店铺的营业状态",
+            "operationId": "setStatus",
+            "parameters": [
+              {
+                "name": "status",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/setmeal": {
+          "put": {
+            "tags": [
+              "套餐相关接口"
+            ],
+            "summary": "修改套餐",
+            "operationId": "update",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SetmealDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "post": {
+            "tags": [
+              "套餐相关接口"
+            ],
+            "summary": "新增套餐",
+            "operationId": "save",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SetmealDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "delete": {
+            "tags": [
+              "套餐相关接口"
+            ],
+            "summary": "批量删除套餐",
+            "operationId": "delete",
+            "parameters": [
+              {
+                "name": "ids",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int64"
+                  }
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/order/rejection": {
+          "put": {
+            "tags": [
+              "订单管理接口"
+            ],
+            "summary": "拒单",
+            "operationId": "rejection",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/OrdersRejectionDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/order/delivery/{id}": {
+          "put": {
+            "tags": [
+              "订单管理接口"
+            ],
+            "summary": "派送订单",
+            "operationId": "delivery",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/order/confirm": {
+          "put": {
+            "tags": [
+              "订单管理接口"
+            ],
+            "summary": "接单",
+            "operationId": "confirm",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/OrdersCancelDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/order/complete/{id}": {
+          "put": {
+            "tags": [
+              "订单管理接口"
+            ],
+            "summary": "完成订单",
+            "operationId": "complete",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/order/cancel": {
+          "put": {
+            "tags": [
+              "订单管理接口"
+            ],
+            "summary": "取消订单",
+            "operationId": "cancel",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/OrdersCancelDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/employee": {
+          "put": {
+            "tags": [
+              "员工相关接口"
+            ],
+            "summary": "编辑员工信息",
+            "operationId": "update_1",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/EmployeeDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "post": {
+            "tags": [
+              "员工相关接口"
+            ],
+            "summary": "新增员工",
+            "operationId": "save_1",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/EmployeeDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/dish": {
+          "put": {
+            "tags": [
+              "菜品相关接口"
+            ],
+            "summary": "修改菜品",
+            "operationId": "update_2",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/DishDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "post": {
+            "tags": [
+              "菜品相关接口"
+            ],
+            "summary": "新增菜品",
+            "operationId": "save_2",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/DishDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "delete": {
+            "tags": [
+              "菜品相关接口"
+            ],
+            "summary": "菜品批量删除",
+            "operationId": "delete_1",
+            "parameters": [
+              {
+                "name": "ids",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int64"
+                  }
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/category": {
+          "put": {
+            "tags": [
+              "分类相关接口"
+            ],
+            "summary": "修改分类",
+            "operationId": "update_3",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/CategoryDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultString"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "post": {
+            "tags": [
+              "分类相关接口"
+            ],
+            "summary": "新增分类",
+            "operationId": "save_3",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/CategoryDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultString"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "delete": {
+            "tags": [
+              "分类相关接口"
+            ],
+            "summary": "删除分类",
+            "operationId": "deleteById",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultString"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/setmeal/status/{status}": {
+          "post": {
+            "tags": [
+              "套餐相关接口"
+            ],
+            "summary": "套餐起售停售",
+            "operationId": "startOrStop",
+            "parameters": [
+              {
+                "name": "status",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "id",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/employee/status/{status}": {
+          "post": {
+            "tags": [
+              "员工相关接口"
+            ],
+            "summary": "启用禁用员工账户",
+            "operationId": "startOrStop_1",
+            "parameters": [
+              {
+                "name": "status",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "id",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/employee/logout": {
+          "post": {
+            "tags": [
+              "员工相关接口"
+            ],
+            "operationId": "logout",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultString"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/employee/login": {
+          "post": {
+            "tags": [
+              "员工相关接口"
+            ],
+            "operationId": "login",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/EmployeeLoginDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultEmployeeLoginVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/dish/status/{status}": {
+          "post": {
+            "tags": [
+              "菜品相关接口"
+            ],
+            "summary": "菜品起售停售",
+            "operationId": "startOrStop_2",
+            "parameters": [
+              {
+                "name": "status",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "id",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultString"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/common/upload": {
+          "post": {
+            "tags": [
+              "通用接口"
+            ],
+            "summary": "文件上传",
+            "operationId": "upload",
+            "requestBody": {
+              "content": {
+                "multipart/form-data": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "description": "待上传的文件",
+                        "format": "binary"
+                      }
+                    }
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultString"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/category/status/{status}": {
+          "post": {
+            "tags": [
+              "分类相关接口"
+            ],
+            "summary": "启用禁用分类",
+            "operationId": "startOrStop_3",
+            "parameters": [
+              {
+                "name": "status",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "id",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultString"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/workspace/overviewSetmeals": {
+          "get": {
+            "tags": [
+              "工作台相关接口"
+            ],
+            "summary": "查询套餐总览",
+            "operationId": "setmealOverView",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultSetmealOverViewVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/workspace/overviewOrders": {
+          "get": {
+            "tags": [
+              "工作台相关接口"
+            ],
+            "summary": "查询订单管理数据",
+            "operationId": "orderOverView",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultOrderOverViewVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/workspace/overviewDishes": {
+          "get": {
+            "tags": [
+              "工作台相关接口"
+            ],
+            "summary": "查询菜品总览",
+            "operationId": "dishOverView",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultDishOverViewVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/workspace/businessData": {
+          "get": {
+            "tags": [
+              "工作台相关接口"
+            ],
+            "summary": "工作台今日数据查询",
+            "operationId": "businessData",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultBusinessDataVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/shop/status": {
+          "get": {
+            "tags": [
+              "店铺相关接口"
+            ],
+            "summary": "获取店铺的营业状态",
+            "operationId": "getStatus",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultInteger"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/setmeal/{id}": {
+          "get": {
+            "tags": [
+              "套餐相关接口"
+            ],
+            "summary": "根据id查询套餐",
+            "operationId": "getById",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultSetmealVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/setmeal/page": {
+          "get": {
+            "tags": [
+              "套餐相关接口"
+            ],
+            "summary": "分页查询",
+            "operationId": "page",
+            "parameters": [
+              {
+                "name": "page",
+                "in": "query",
+                "description": "页码",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "pageSize",
+                "in": "query",
+                "description": "每页记录数",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "name",
+                "in": "query",
+                "description": "套餐名称",
+                "required": false,
+                "schema": {
+                  "type": "string",
+                  "description": "套餐名称"
+                }
+              },
+              {
+                "name": "categoryId",
+                "in": "query",
+                "description": "分类id",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "status",
+                "in": "query",
+                "description": "状态 0表示禁用 1表示启用",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultPageResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/report/userStatistics": {
+          "get": {
+            "tags": [
+              "统计报表相关接口"
+            ],
+            "summary": "用户数据统计",
+            "operationId": "userStatistics",
+            "parameters": [
+              {
+                "name": "begin",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "string",
+                  "format": "date"
+                }
+              },
+              {
+                "name": "end",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "string",
+                  "format": "date"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultUserReportVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/report/turnoverStatistics": {
+          "get": {
+            "tags": [
+              "统计报表相关接口"
+            ],
+            "summary": "营业额数据统计",
+            "operationId": "turnoverStatistics",
+            "parameters": [
+              {
+                "name": "begin",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "string",
+                  "format": "date"
+                }
+              },
+              {
+                "name": "end",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "string",
+                  "format": "date"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultTurnoverReportVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/report/top10": {
+          "get": {
+            "tags": [
+              "统计报表相关接口"
+            ],
+            "summary": "销量排名统计",
+            "operationId": "top10",
+            "parameters": [
+              {
+                "name": "begin",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "string",
+                  "format": "date"
+                }
+              },
+              {
+                "name": "end",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "string",
+                  "format": "date"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultSalesTop10ReportVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/report/ordersStatistics": {
+          "get": {
+            "tags": [
+              "统计报表相关接口"
+            ],
+            "summary": "用户数据统计",
+            "operationId": "orderStatistics",
+            "parameters": [
+              {
+                "name": "begin",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "string",
+                  "format": "date"
+                }
+              },
+              {
+                "name": "end",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "string",
+                  "format": "date"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultOrderReportVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/report/export": {
+          "get": {
+            "tags": [
+              "统计报表相关接口"
+            ],
+            "summary": "导出运营数据报表",
+            "operationId": "export",
+            "responses": {
+              "200": {
+                "description": "OK"
+              }
+            }
+          }
+        },
+        "/admin/order/statistics": {
+          "get": {
+            "tags": [
+              "订单管理接口"
+            ],
+            "summary": "各个状态的订单数量统计",
+            "operationId": "statistics",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultOrderStatisticsVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/order/details/{id}": {
+          "get": {
+            "tags": [
+              "订单管理接口"
+            ],
+            "summary": "查询订单详情",
+            "operationId": "details",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultOrderVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/order/conditionSearch": {
+          "get": {
+            "tags": [
+              "订单管理接口"
+            ],
+            "summary": "订单搜索",
+            "operationId": "conditionSearch",
+            "parameters": [
+              {
+                "name": "page",
+                "in": "query",
+                "description": "页码",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "pageSize",
+                "in": "query",
+                "description": "每页记录数",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "number",
+                "in": "query",
+                "description": "订单号",
+                "required": false,
+                "schema": {
+                  "type": "string",
+                  "description": "订单号"
+                }
+              },
+              {
+                "name": "phone",
+                "in": "query",
+                "description": "手机号",
+                "required": false,
+                "schema": {
+                  "type": "string",
+                  "description": "手机号"
+                }
+              },
+              {
+                "name": "status",
+                "in": "query",
+                "description": "订单状态",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "beginTime",
+                "in": "query",
+                "description": "查询开始时间",
+                "required": false,
+                "schema": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              {
+                "name": "endTime",
+                "in": "query",
+                "description": "查询结束时间",
+                "required": false,
+                "schema": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              },
+              {
+                "name": "userId",
+                "in": "query",
+                "description": "下单用户id",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultPageResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/employee/{id}": {
+          "get": {
+            "tags": [
+              "员工相关接口"
+            ],
+            "summary": "根据iD查询用户信息",
+            "operationId": "getById_1",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultEmployee"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/employee/page": {
+          "get": {
+            "tags": [
+              "员工相关接口"
+            ],
+            "summary": "员工分页查询",
+            "operationId": "page_1",
+            "parameters": [
+              {
+                "name": "name",
+                "in": "query",
+                "description": "员工姓名",
+                "required": false,
+                "schema": {
+                  "type": "string",
+                  "description": "员工姓名"
+                }
+              },
+              {
+                "name": "page",
+                "in": "query",
+                "description": "页码",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "pageSize",
+                "in": "query",
+                "description": "每页显示记录数",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultPageResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/dish/{id}": {
+          "get": {
+            "tags": [
+              "菜品相关接口"
+            ],
+            "summary": "根据id查询菜品",
+            "operationId": "getById_2",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultDishVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/dish/page": {
+          "get": {
+            "tags": [
+              "菜品相关接口"
+            ],
+            "summary": "菜品分页查询",
+            "operationId": "page_2",
+            "parameters": [
+              {
+                "name": "page",
+                "in": "query",
+                "description": "页码",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "pageSize",
+                "in": "query",
+                "description": "每页记录数",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "name",
+                "in": "query",
+                "description": "菜品名称",
+                "required": false,
+                "schema": {
+                  "type": "string",
+                  "description": "菜品名称"
+                }
+              },
+              {
+                "name": "categoryId",
+                "in": "query",
+                "description": "分类id",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "status",
+                "in": "query",
+                "description": "状态 0表示禁用 1表示启用",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultPageResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/dish/list": {
+          "get": {
+            "tags": [
+              "菜品相关接口"
+            ],
+            "summary": "根据分类id查询菜品",
+            "operationId": "list",
+            "parameters": [
+              {
+                "name": "categoryId",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultListDish"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/category/page": {
+          "get": {
+            "tags": [
+              "分类相关接口"
+            ],
+            "summary": "分类分页查询",
+            "operationId": "page_3",
+            "parameters": [
+              {
+                "name": "page",
+                "in": "query",
+                "description": "页码",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "pageSize",
+                "in": "query",
+                "description": "每页记录数",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "name",
+                "in": "query",
+                "description": "分类名称",
+                "required": false,
+                "schema": {
+                  "type": "string",
+                  "description": "分类名称"
+                }
+              },
+              {
+                "name": "type",
+                "in": "query",
+                "description": "分类类型 1菜品分类 2套餐分类",
+                "required": false,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultPageResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/admin/category/list": {
+          "get": {
+            "tags": [
+              "分类相关接口"
+            ],
+            "summary": "根据类型查询分类",
+            "operationId": "list_1",
+            "parameters": [
+              {
+                "name": "type",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultListCategory"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "components": {
+        "schemas": {
+          "Result": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "object",
+                "description": "数据"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "SetmealDTO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "套餐id",
+                "format": "int64"
+              },
+              "categoryId": {
+                "type": "integer",
+                "description": "分类id",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string",
+                "description": "套餐名称"
+              },
+              "price": {
+                "type": "number",
+                "description": "套餐价格"
+              },
+              "status": {
+                "type": "integer",
+                "description": "状态 0:停用 1:启用",
+                "format": "int32"
+              },
+              "description": {
+                "type": "string",
+                "description": "描述信息"
+              },
+              "image": {
+                "type": "string",
+                "description": "图片"
+              },
+              "setmealDishes": {
+                "type": "array",
+                "description": "套餐菜品关系",
+                "items": {
+                  "$ref": "#/components/schemas/SetmealDish"
+                }
+              }
+            },
+            "description": "套餐信息传递的数据模型"
+          },
+          "SetmealDish": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "setmealId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "dishId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string"
+              },
+              "price": {
+                "type": "number"
+              },
+              "copies": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "description": "套餐菜品关系"
+          },
+          "OrdersRejectionDTO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "订单id",
+                "format": "int64"
+              },
+              "rejectionReason": {
+                "type": "string",
+                "description": "订单拒绝原因"
+              }
+            },
+            "description": "拒单传递的数据模型"
+          },
+          "OrdersCancelDTO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "订单id",
+                "format": "int64"
+              },
+              "cancelReason": {
+                "type": "string",
+                "description": "订单取消原因"
+              }
+            },
+            "description": "取消订单传递的数据模型"
+          },
+          "EmployeeDTO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "员工ID（数据库主键）",
+                "format": "int64"
+              },
+              "username": {
+                "type": "string",
+                "description": "员工登录用的用户名"
+              },
+              "name": {
+                "type": "string",
+                "description": "员工真实姓名"
+              },
+              "phone": {
+                "type": "string",
+                "description": "员工手机号码"
+              },
+              "sex": {
+                "type": "string",
+                "description": "员工性别"
+              },
+              "idNumber": {
+                "type": "string",
+                "description": "员工身份证号码"
+              }
+            },
+            "description": "员工信息传递的数据模型"
+          },
+          "DishDTO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "菜品id",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string",
+                "description": "菜品名称"
+              },
+              "categoryId": {
+                "type": "integer",
+                "description": "菜品分类id",
+                "format": "int64"
+              },
+              "price": {
+                "type": "number",
+                "description": "菜品价格"
+              },
+              "image": {
+                "type": "string",
+                "description": "图片"
+              },
+              "description": {
+                "type": "string",
+                "description": "描述信息"
+              },
+              "status": {
+                "type": "integer",
+                "description": "0 停售 1 起售",
+                "format": "int32"
+              },
+              "flavors": {
+                "type": "array",
+                "description": "口味",
+                "items": {
+                  "$ref": "#/components/schemas/DishFlavor"
+                }
+              }
+            },
+            "description": "菜品信息传递的数据模型"
+          },
+          "DishFlavor": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "dishId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "description": "口味"
+          },
+          "CategoryDTO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "主键",
+                "format": "int64"
+              },
+              "type": {
+                "type": "integer",
+                "description": "类型 1 菜品分类 2 套餐分类",
+                "format": "int32"
+              },
+              "name": {
+                "type": "string",
+                "description": "分类名称"
+              },
+              "sort": {
+                "type": "integer",
+                "description": "排序",
+                "format": "int32"
+              }
+            },
+            "description": "分类信息传递的数据模型"
+          },
+          "ResultString": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "string",
+                "description": "数据"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "EmployeeLoginDTO": {
+            "type": "object",
+            "properties": {
+              "username": {
+                "type": "string",
+                "description": "用户名"
+              },
+              "password": {
+                "type": "string",
+                "description": "密码"
+              }
+            },
+            "description": "员工登录时传递的数据模型"
+          },
+          "EmployeeLoginVO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "主键值",
+                "format": "int64"
+              },
+              "userName": {
+                "type": "string",
+                "description": "用户名"
+              },
+              "name": {
+                "type": "string",
+                "description": "姓名"
+              },
+              "token": {
+                "type": "string",
+                "description": "jwt令牌"
+              }
+            },
+            "description": "员工登录返回的数据格式"
+          },
+          "ResultEmployeeLoginVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/EmployeeLoginVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "ResultSetmealOverViewVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/SetmealOverViewVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "SetmealOverViewVO": {
+            "type": "object",
+            "properties": {
+              "sold": {
+                "type": "integer",
+                "description": "已启售数量",
+                "format": "int32"
+              },
+              "discontinued": {
+                "type": "integer",
+                "description": "已停售数量",
+                "format": "int32"
+              }
+            },
+            "description": "套餐总览返回的数据格式"
+          },
+          "OrderOverViewVO": {
+            "type": "object",
+            "properties": {
+              "waitingOrders": {
+                "type": "integer",
+                "description": "待接单数量",
+                "format": "int32"
+              },
+              "deliveredOrders": {
+                "type": "integer",
+                "description": "待派送数量",
+                "format": "int32"
+              },
+              "completedOrders": {
+                "type": "integer",
+                "description": "已完成数量",
+                "format": "int32"
+              },
+              "cancelledOrders": {
+                "type": "integer",
+                "description": "已取消数量",
+                "format": "int32"
+              },
+              "allOrders": {
+                "type": "integer",
+                "description": "全部订单",
+                "format": "int32"
+              }
+            },
+            "description": "订单概览返回的数据格式"
+          },
+          "ResultOrderOverViewVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/OrderOverViewVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "DishOverViewVO": {
+            "type": "object",
+            "properties": {
+              "sold": {
+                "type": "integer",
+                "description": "已启售数量",
+                "format": "int32"
+              },
+              "discontinued": {
+                "type": "integer",
+                "description": "已停售数量",
+                "format": "int32"
+              }
+            },
+            "description": "菜品总览返回的数据格式"
+          },
+          "ResultDishOverViewVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/DishOverViewVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "BusinessDataVO": {
+            "type": "object",
+            "properties": {
+              "turnover": {
+                "type": "number",
+                "description": "营业额",
+                "format": "double"
+              },
+              "validOrderCount": {
+                "type": "integer",
+                "description": "有效订单数",
+                "format": "int32"
+              },
+              "orderCompletionRate": {
+                "type": "number",
+                "description": "订单完成率",
+                "format": "double"
+              },
+              "unitPrice": {
+                "type": "number",
+                "description": "平均客单价",
+                "format": "double"
+              },
+              "newUsers": {
+                "type": "integer",
+                "description": "新增用户数",
+                "format": "int32"
+              }
+            },
+            "description": "数据概览返回的数据格式"
+          },
+          "ResultBusinessDataVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/BusinessDataVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "ResultInteger": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "integer",
+                "description": "数据",
+                "format": "int32"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "ResultSetmealVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/SetmealVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "SetmealVO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "套餐id",
+                "format": "int64"
+              },
+              "categoryId": {
+                "type": "integer",
+                "description": "分类id",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string",
+                "description": "套餐名称"
+              },
+              "price": {
+                "type": "number",
+                "description": "套餐价格"
+              },
+              "status": {
+                "type": "integer",
+                "description": "状态 0:停用 1:启用",
+                "format": "int32"
+              },
+              "description": {
+                "type": "string",
+                "description": "描述信息"
+              },
+              "image": {
+                "type": "string",
+                "description": "图片"
+              },
+              "updateTime": {
+                "type": "string",
+                "description": "更新时间",
+                "format": "date-time"
+              },
+              "categoryName": {
+                "type": "string",
+                "description": "分类名称"
+              },
+              "setmealDishes": {
+                "type": "array",
+                "description": "套餐和菜品的关联关系",
+                "items": {
+                  "$ref": "#/components/schemas/SetmealDish"
+                }
+              }
+            },
+            "description": "套餐信息返回的数据格式"
+          },
+          "PageResult": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "description": "总记录数",
+                "format": "int64"
+              },
+              "records": {
+                "type": "array",
+                "description": "当前页数据集合",
+                "items": {
+                  "type": "object",
+                  "description": "当前页数据集合"
+                }
+              }
+            },
+            "description": "分页查询结果"
+          },
+          "ResultPageResult": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/PageResult"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "ResultUserReportVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/UserReportVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "UserReportVO": {
+            "type": "object",
+            "properties": {
+              "dateList": {
+                "type": "string",
+                "description": "日期，以逗号分隔，例如：2022-10-01,2022-10-02,2022-10-03"
+              },
+              "totalUserList": {
+                "type": "string",
+                "description": "用户总量，以逗号分隔，例如：200,210,220"
+              },
+              "newUserList": {
+                "type": "string",
+                "description": "新增用户，以逗号分隔，例如：20,21,10"
+              }
+            },
+            "description": "用户统计返回的数据格式"
+          },
+          "ResultTurnoverReportVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/TurnoverReportVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "TurnoverReportVO": {
+            "type": "object",
+            "properties": {
+              "dateList": {
+                "type": "string",
+                "description": "日期，以逗号分隔，例如：2022-10-01,2022-10-02,2022-10-03"
+              },
+              "turnoverList": {
+                "type": "string",
+                "description": "营业额，以逗号分隔，例如：406.0,1520.0,75.0"
+              }
+            },
+            "description": "营业额统计返回的数据格式"
+          },
+          "ResultSalesTop10ReportVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/SalesTop10ReportVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "SalesTop10ReportVO": {
+            "type": "object",
+            "properties": {
+              "nameList": {
+                "type": "string",
+                "description": "商品名称列表，以逗号分隔，例如：鱼香肉丝,宫保鸡丁,水煮鱼"
+              },
+              "numberList": {
+                "type": "string",
+                "description": "销量列表，以逗号分隔，例如：260,215,200"
+              }
+            },
+            "description": "销量排名Top10返回的数据格式"
+          },
+          "OrderReportVO": {
+            "type": "object",
+            "properties": {
+              "dateList": {
+                "type": "string",
+                "description": "日期，以逗号分隔，例如：2022-10-01,2022-10-02,2022-10-03"
+              },
+              "orderCountList": {
+                "type": "string",
+                "description": "每日订单数，以逗号分隔，例如：260,210,215"
+              },
+              "validOrderCountList": {
+                "type": "string",
+                "description": "每日有效订单数，以逗号分隔，例如：20,21,10"
+              },
+              "totalOrderCount": {
+                "type": "integer",
+                "description": "订单总数",
+                "format": "int32"
+              },
+              "validOrderCount": {
+                "type": "integer",
+                "description": "有效订单数",
+                "format": "int32"
+              },
+              "orderCompletionRate": {
+                "type": "number",
+                "description": "订单完成率",
+                "format": "double"
+              }
+            },
+            "description": "订单统计返回的数据格式"
+          },
+          "ResultOrderReportVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/OrderReportVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "OrderStatisticsVO": {
+            "type": "object",
+            "properties": {
+              "toBeConfirmed": {
+                "type": "integer",
+                "description": "待接单数量",
+                "format": "int32"
+              },
+              "confirmed": {
+                "type": "integer",
+                "description": "待派送数量",
+                "format": "int32"
+              },
+              "deliveryInProgress": {
+                "type": "integer",
+                "description": "派送中数量",
+                "format": "int32"
+              }
+            },
+            "description": "各状态订单数量统计返回的数据格式"
+          },
+          "ResultOrderStatisticsVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/OrderStatisticsVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "OrderDetail": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string"
+              },
+              "orderId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "dishId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "setmealId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "dishFlavor": {
+                "type": "string"
+              },
+              "number": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "image": {
+                "type": "string"
+              }
+            },
+            "description": "订单详情"
+          },
+          "OrderVO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "number": {
+                "type": "string"
+              },
+              "status": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "userId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "addressBookId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "orderTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "checkoutTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "payMethod": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "payStatus": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "remark": {
+                "type": "string"
+              },
+              "userName": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "consignee": {
+                "type": "string"
+              },
+              "cancelReason": {
+                "type": "string"
+              },
+              "rejectionReason": {
+                "type": "string"
+              },
+              "cancelTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "estimatedDeliveryTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deliveryStatus": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "deliveryTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "packAmount": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "tablewareNumber": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "tablewareStatus": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "orderDishes": {
+                "type": "string",
+                "description": "订单菜品信息"
+              },
+              "orderDetailList": {
+                "type": "array",
+                "description": "订单详情",
+                "items": {
+                  "$ref": "#/components/schemas/OrderDetail"
+                }
+              }
+            },
+            "description": "订单信息返回的数据格式"
+          },
+          "ResultOrderVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/OrderVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "Employee": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "username": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "password": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "sex": {
+                "type": "string"
+              },
+              "idNumber": {
+                "type": "string"
+              },
+              "status": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "createTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "createUser": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "updateUser": {
+                "type": "integer",
+                "format": "int64"
+              }
+            },
+            "description": "数据"
+          },
+          "ResultEmployee": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/Employee"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "DishVO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "菜品id",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string",
+                "description": "菜品名称"
+              },
+              "categoryId": {
+                "type": "integer",
+                "description": "菜品分类id",
+                "format": "int64"
+              },
+              "price": {
+                "type": "number",
+                "description": "菜品价格"
+              },
+              "image": {
+                "type": "string",
+                "description": "图片"
+              },
+              "description": {
+                "type": "string",
+                "description": "描述信息"
+              },
+              "status": {
+                "type": "integer",
+                "description": "0 停售 1 起售",
+                "format": "int32"
+              },
+              "updateTime": {
+                "type": "string",
+                "description": "更新时间",
+                "format": "date-time"
+              },
+              "categoryName": {
+                "type": "string",
+                "description": "分类名称"
+              },
+              "flavors": {
+                "type": "array",
+                "description": "菜品关联的口味",
+                "items": {
+                  "$ref": "#/components/schemas/DishFlavor"
+                }
+              }
+            },
+            "description": "菜品信息返回的数据格式"
+          },
+          "ResultDishVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/DishVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "Dish": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string"
+              },
+              "categoryId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "price": {
+                "type": "number"
+              },
+              "image": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "status": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "createTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "createUser": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "updateUser": {
+                "type": "integer",
+                "format": "int64"
+              }
+            },
+            "description": "数据"
+          },
+          "ResultListDish": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "array",
+                "description": "数据",
+                "items": {
+                  "$ref": "#/components/schemas/Dish"
+                }
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "Category": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "type": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "name": {
+                "type": "string"
+              },
+              "sort": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "status": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "createTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "createUser": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "updateUser": {
+                "type": "integer",
+                "format": "int64"
+              }
+            },
+            "description": "数据"
+          },
+          "ResultListCategory": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "array",
+                "description": "数据",
+                "items": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            },
+            "description": "后端统一返回结果"
+          }
+        },
+        "securitySchemes": {
+          "adminToken": {
+            "type": "apiKey",
+            "name": "token",
+            "in": "header"
+          },
+          "userToken": {
+            "type": "apiKey",
+            "name": "authentication",
+            "in": "header"
+          }
+        }
+      }
+    },
+    "elapsed_ms": 6,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "DOC-03",
+    "name": "用户端 OpenAPI JSON",
+    "nature": "冒烟",
+    "method": "GET",
+    "endpoint": "/v3/api-docs/用户端接口",
+    "request_data": null,
+    "boundary": "应返回 paths",
+    "expected": "HTTP 200 且含 paths",
+    "http_status": 200,
+    "response": {
+      "openapi": "3.0.1",
+      "info": {
+        "title": "苍穹外卖项目接口文档",
+        "description": "苍穹外卖项目接口文档",
+        "version": "2.0"
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8080",
+          "description": "Generated server url"
+        }
+      ],
+      "security": [
+        {
+          "userToken": []
+        }
+      ],
+      "paths": {
+        "/user/order/payment": {
+          "put": {
+            "tags": [
+              "C端-订单接口"
+            ],
+            "summary": "订单支付",
+            "operationId": "payment",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/OrdersPaymentDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultOrderPaymentVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/order/cancel/{id}": {
+          "put": {
+            "tags": [
+              "C端-订单接口"
+            ],
+            "summary": "用户取消订单",
+            "operationId": "cancel",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/addressBook": {
+          "put": {
+            "tags": [
+              "C端地址簿接口"
+            ],
+            "summary": "根据id修改地址",
+            "operationId": "update",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/AddressBook"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "post": {
+            "tags": [
+              "C端地址簿接口"
+            ],
+            "summary": "新增地址",
+            "operationId": "save",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/AddressBook"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "delete": {
+            "tags": [
+              "C端地址簿接口"
+            ],
+            "summary": "根据id删除地址",
+            "operationId": "deleteById",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/addressBook/default": {
+          "get": {
+            "tags": [
+              "C端地址簿接口"
+            ],
+            "summary": "查询默认地址",
+            "operationId": "getDefault",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultAddressBook"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "put": {
+            "tags": [
+              "C端地址簿接口"
+            ],
+            "summary": "设置默认地址",
+            "operationId": "setDefault",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/AddressBook"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/user/login": {
+          "post": {
+            "tags": [
+              "C端用户相关接口"
+            ],
+            "summary": "微信登录",
+            "operationId": "login",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserLoginDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultUserLoginVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/shoppingCart/sub": {
+          "post": {
+            "tags": [
+              "C端-购物车接口"
+            ],
+            "summary": "删除购物车中一个商品",
+            "operationId": "sub",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ShoppingCartDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/shoppingCart/add": {
+          "post": {
+            "tags": [
+              "C端-购物车接口"
+            ],
+            "summary": "添加购物车",
+            "operationId": "add",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ShoppingCartDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultString"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/order/submit": {
+          "post": {
+            "tags": [
+              "C端-订单接口"
+            ],
+            "summary": "用户下单",
+            "operationId": "submit",
+            "requestBody": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/OrdersSubmitDTO"
+                  }
+                }
+              },
+              "required": true
+            },
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultOrderSubmitVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/order/repetition/{id}": {
+          "post": {
+            "tags": [
+              "C端-订单接口"
+            ],
+            "summary": "再来一单",
+            "operationId": "repetition",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/shoppingCart/list": {
+          "get": {
+            "tags": [
+              "C端-购物车接口"
+            ],
+            "summary": "查看购物车",
+            "operationId": "list",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultListShoppingCart"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/shop/status": {
+          "get": {
+            "tags": [
+              "店铺相关接口"
+            ],
+            "summary": "获取店铺的营业状态",
+            "operationId": "getStatus",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultInteger"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/setmeal/list": {
+          "get": {
+            "tags": [
+              "C端-套餐浏览接口"
+            ],
+            "summary": "根据分类id查询套餐",
+            "operationId": "list_1",
+            "parameters": [
+              {
+                "name": "categoryId",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultListSetmeal"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/setmeal/dish/{id}": {
+          "get": {
+            "tags": [
+              "C端-套餐浏览接口"
+            ],
+            "summary": "根据套餐id查询包含的菜品列表",
+            "operationId": "dishList",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultListDishItemVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/order/reminder/{id}": {
+          "get": {
+            "tags": [
+              "C端-订单接口"
+            ],
+            "summary": "用户催单",
+            "operationId": "reminder",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Result"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/order/orderDetail/{id}": {
+          "get": {
+            "tags": [
+              "C端-订单接口"
+            ],
+            "summary": "查询订单详情",
+            "operationId": "details",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultOrderVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/order/historyOrders": {
+          "get": {
+            "tags": [
+              "C端-订单接口"
+            ],
+            "summary": "历史订单查询",
+            "operationId": "page",
+            "parameters": [
+              {
+                "name": "pageNum",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "pageSize",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              {
+                "name": "status",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultPageResult"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/dish/list": {
+          "get": {
+            "tags": [
+              "C端-菜品浏览接口"
+            ],
+            "summary": "根据分类id查询菜品",
+            "operationId": "list_2",
+            "parameters": [
+              {
+                "name": "categoryId",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultListDishVO"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/category/list": {
+          "get": {
+            "tags": [
+              "C端-分类接口"
+            ],
+            "summary": "查询分类",
+            "operationId": "list_3",
+            "parameters": [
+              {
+                "name": "type",
+                "in": "query",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultListCategory"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/addressBook/{id}": {
+          "get": {
+            "tags": [
+              "C端地址簿接口"
+            ],
+            "summary": "根据id查询地址",
+            "operationId": "getById",
+            "parameters": [
+              {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultAddressBook"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/addressBook/list": {
+          "get": {
+            "tags": [
+              "C端地址簿接口"
+            ],
+            "summary": "查询当前登录用户的所有地址信息",
+            "operationId": "list_4",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultListAddressBook"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/user/shoppingCart/clean": {
+          "delete": {
+            "tags": [
+              "C端-购物车接口"
+            ],
+            "summary": "清空购物车商品",
+            "operationId": "clean",
+            "responses": {
+              "200": {
+                "description": "OK",
+                "content": {
+                  "*/*": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResultString"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "components": {
+        "schemas": {
+          "OrdersPaymentDTO": {
+            "type": "object",
+            "properties": {
+              "orderNumber": {
+                "type": "string",
+                "description": "订单号"
+              },
+              "payMethod": {
+                "type": "integer",
+                "description": "付款方式",
+                "format": "int32"
+              }
+            },
+            "description": "订单支付传递的数据模型"
+          },
+          "OrderPaymentVO": {
+            "type": "object",
+            "properties": {
+              "nonceStr": {
+                "type": "string",
+                "description": "随机字符串"
+              },
+              "paySign": {
+                "type": "string",
+                "description": "签名"
+              },
+              "timeStamp": {
+                "type": "string",
+                "description": "时间戳"
+              },
+              "signType": {
+                "type": "string",
+                "description": "签名算法"
+              },
+              "packageStr": {
+                "type": "string",
+                "description": "统一下单接口返回的 prepay_id 参数值"
+              }
+            },
+            "description": "订单支付返回的数据格式"
+          },
+          "ResultOrderPaymentVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/OrderPaymentVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "Result": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "object",
+                "description": "数据"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "AddressBook": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "userId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "consignee": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "sex": {
+                "type": "string"
+              },
+              "provinceCode": {
+                "type": "string"
+              },
+              "provinceName": {
+                "type": "string"
+              },
+              "cityCode": {
+                "type": "string"
+              },
+              "cityName": {
+                "type": "string"
+              },
+              "districtCode": {
+                "type": "string"
+              },
+              "districtName": {
+                "type": "string"
+              },
+              "detail": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "isDefault": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          },
+          "UserLoginDTO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "微信登录授权码"
+              }
+            },
+            "description": "C端用户登录时传递的数据模型"
+          },
+          "ResultUserLoginVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/UserLoginVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "UserLoginVO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "主键值",
+                "format": "int64"
+              },
+              "openid": {
+                "type": "string",
+                "description": "微信用户唯一标识"
+              },
+              "token": {
+                "type": "string",
+                "description": "jwt令牌"
+              }
+            },
+            "description": "C端用户登录返回的数据格式"
+          },
+          "ShoppingCartDTO": {
+            "type": "object",
+            "properties": {
+              "dishId": {
+                "type": "integer",
+                "description": "菜品id",
+                "format": "int64"
+              },
+              "setmealId": {
+                "type": "integer",
+                "description": "套餐id",
+                "format": "int64"
+              },
+              "dishFlavor": {
+                "type": "string",
+                "description": "菜品口味"
+              }
+            },
+            "description": "购物车操作传递的数据模型"
+          },
+          "ResultString": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "string",
+                "description": "数据"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "OrdersSubmitDTO": {
+            "type": "object",
+            "properties": {
+              "addressBookId": {
+                "type": "integer",
+                "description": "地址簿id",
+                "format": "int64"
+              },
+              "payMethod": {
+                "type": "integer",
+                "description": "付款方式",
+                "format": "int32"
+              },
+              "remark": {
+                "type": "string",
+                "description": "备注"
+              },
+              "estimatedDeliveryTime": {
+                "type": "string",
+                "description": "预计送达时间",
+                "format": "date-time"
+              },
+              "deliveryStatus": {
+                "type": "integer",
+                "description": "配送状态 1立即送出 0选择具体时间",
+                "format": "int32"
+              },
+              "tablewareNumber": {
+                "type": "integer",
+                "description": "餐具数量",
+                "format": "int32"
+              },
+              "tablewareStatus": {
+                "type": "integer",
+                "description": "餐具数量状态 1按餐量提供 0选择具体数量",
+                "format": "int32"
+              },
+              "packAmount": {
+                "type": "integer",
+                "description": "打包费",
+                "format": "int32"
+              },
+              "amount": {
+                "type": "number",
+                "description": "总金额"
+              }
+            },
+            "description": "用户下单传递的数据模型"
+          },
+          "OrderSubmitVO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "订单id",
+                "format": "int64"
+              },
+              "orderNumber": {
+                "type": "string",
+                "description": "订单号"
+              },
+              "orderAmount": {
+                "type": "number",
+                "description": "订单金额"
+              },
+              "orderTime": {
+                "type": "string",
+                "description": "下单时间",
+                "format": "date-time"
+              }
+            },
+            "description": "用户下单返回的数据格式"
+          },
+          "ResultOrderSubmitVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/OrderSubmitVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "ResultListShoppingCart": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "array",
+                "description": "数据",
+                "items": {
+                  "$ref": "#/components/schemas/ShoppingCart"
+                }
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "ShoppingCart": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string"
+              },
+              "userId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "dishId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "setmealId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "dishFlavor": {
+                "type": "string"
+              },
+              "number": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "image": {
+                "type": "string"
+              },
+              "createTime": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "description": "数据"
+          },
+          "ResultInteger": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "integer",
+                "description": "数据",
+                "format": "int32"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "ResultListSetmeal": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "array",
+                "description": "数据",
+                "items": {
+                  "$ref": "#/components/schemas/Setmeal"
+                }
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "Setmeal": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "categoryId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string"
+              },
+              "price": {
+                "type": "number"
+              },
+              "status": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "description": {
+                "type": "string"
+              },
+              "image": {
+                "type": "string"
+              },
+              "createTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "createUser": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "updateUser": {
+                "type": "integer",
+                "format": "int64"
+              }
+            },
+            "description": "数据"
+          },
+          "DishItemVO": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "菜品名称"
+              },
+              "copies": {
+                "type": "integer",
+                "description": "份数",
+                "format": "int32"
+              },
+              "image": {
+                "type": "string",
+                "description": "菜品图片"
+              },
+              "description": {
+                "type": "string",
+                "description": "菜品描述"
+              }
+            },
+            "description": "套餐内菜品项返回的数据格式"
+          },
+          "ResultListDishItemVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "array",
+                "description": "数据",
+                "items": {
+                  "$ref": "#/components/schemas/DishItemVO"
+                }
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "OrderDetail": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string"
+              },
+              "orderId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "dishId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "setmealId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "dishFlavor": {
+                "type": "string"
+              },
+              "number": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "image": {
+                "type": "string"
+              }
+            },
+            "description": "订单详情"
+          },
+          "OrderVO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "number": {
+                "type": "string"
+              },
+              "status": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "userId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "addressBookId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "orderTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "checkoutTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "payMethod": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "payStatus": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "remark": {
+                "type": "string"
+              },
+              "userName": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "consignee": {
+                "type": "string"
+              },
+              "cancelReason": {
+                "type": "string"
+              },
+              "rejectionReason": {
+                "type": "string"
+              },
+              "cancelTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "estimatedDeliveryTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "deliveryStatus": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "deliveryTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "packAmount": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "tablewareNumber": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "tablewareStatus": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "orderDishes": {
+                "type": "string",
+                "description": "订单菜品信息"
+              },
+              "orderDetailList": {
+                "type": "array",
+                "description": "订单详情",
+                "items": {
+                  "$ref": "#/components/schemas/OrderDetail"
+                }
+              }
+            },
+            "description": "订单信息返回的数据格式"
+          },
+          "ResultOrderVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/OrderVO"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "PageResult": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "description": "总记录数",
+                "format": "int64"
+              },
+              "records": {
+                "type": "array",
+                "description": "当前页数据集合",
+                "items": {
+                  "type": "object",
+                  "description": "当前页数据集合"
+                }
+              }
+            },
+            "description": "分页查询结果"
+          },
+          "ResultPageResult": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/PageResult"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "DishFlavor": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "dishId": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "description": "菜品关联的口味"
+          },
+          "DishVO": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "菜品id",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string",
+                "description": "菜品名称"
+              },
+              "categoryId": {
+                "type": "integer",
+                "description": "菜品分类id",
+                "format": "int64"
+              },
+              "price": {
+                "type": "number",
+                "description": "菜品价格"
+              },
+              "image": {
+                "type": "string",
+                "description": "图片"
+              },
+              "description": {
+                "type": "string",
+                "description": "描述信息"
+              },
+              "status": {
+                "type": "integer",
+                "description": "0 停售 1 起售",
+                "format": "int32"
+              },
+              "updateTime": {
+                "type": "string",
+                "description": "更新时间",
+                "format": "date-time"
+              },
+              "categoryName": {
+                "type": "string",
+                "description": "分类名称"
+              },
+              "flavors": {
+                "type": "array",
+                "description": "菜品关联的口味",
+                "items": {
+                  "$ref": "#/components/schemas/DishFlavor"
+                }
+              }
+            },
+            "description": "菜品信息返回的数据格式"
+          },
+          "ResultListDishVO": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "array",
+                "description": "数据",
+                "items": {
+                  "$ref": "#/components/schemas/DishVO"
+                }
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "Category": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "type": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "name": {
+                "type": "string"
+              },
+              "sort": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "status": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "createTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updateTime": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "createUser": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "updateUser": {
+                "type": "integer",
+                "format": "int64"
+              }
+            },
+            "description": "数据"
+          },
+          "ResultListCategory": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "array",
+                "description": "数据",
+                "items": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "ResultAddressBook": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "$ref": "#/components/schemas/AddressBook"
+              }
+            },
+            "description": "后端统一返回结果"
+          },
+          "ResultListAddressBook": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "description": "编码：1成功，0和其它数字为失败",
+                "format": "int32"
+              },
+              "msg": {
+                "type": "string",
+                "description": "错误信息"
+              },
+              "data": {
+                "type": "array",
+                "description": "数据",
+                "items": {
+                  "$ref": "#/components/schemas/AddressBook"
+                }
+              }
+            },
+            "description": "后端统一返回结果"
+          }
+        },
+        "securitySchemes": {
+          "adminToken": {
+            "type": "apiKey",
+            "name": "token",
+            "in": "header"
+          },
+          "userToken": {
+            "type": "apiKey",
+            "name": "authentication",
+            "in": "header"
+          }
+        }
+      }
+    },
+    "elapsed_ms": 4,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-LOGIN-01",
+    "name": "管理员正确账号密码登录",
+    "nature": "功能/正向",
+    "method": "POST",
+    "endpoint": "/admin/employee/login",
+    "request_data": {
+      "username": "admin",
+      "password": "123456"
+    },
+    "boundary": "合法账号",
+    "expected": "code=1 且返回 token",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "id": 1,
+        "userName": "admin",
+        "name": "管理员",
+        "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBJZCI6MSwiZXhwIjoxNzg3NjY4NzMyfQ.dDLRYS9gIP98_yEuEVtZjKPKszJmjHsoF2kXb9F7Z4Q"
+      }
+    },
+    "elapsed_ms": 142,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-LOGIN-02",
+    "name": "错误密码登录",
+    "nature": "边界/负向",
+    "method": "POST",
+    "endpoint": "/admin/employee/login",
+    "request_data": {
+      "username": "admin",
+      "password": "wrong"
+    },
+    "boundary": "密码错误",
+    "expected": "业务失败 code!=1 或异常信息",
+    "http_status": 200,
+    "response": {
+      "code": 0,
+      "msg": "密码错误",
+      "data": null
+    },
+    "elapsed_ms": 72,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-LOGIN-03",
+    "name": "不存在的用户名",
+    "nature": "边界/负向",
+    "method": "POST",
+    "endpoint": "/admin/employee/login",
+    "request_data": {
+      "username": "nobody",
+      "password": "123456"
+    },
+    "boundary": "账号不存在",
+    "expected": "业务失败",
+    "http_status": 200,
+    "response": {
+      "code": 0,
+      "msg": "账号不存在",
+      "data": null
+    },
+    "elapsed_ms": 14,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-LOGIN-04",
+    "name": "空 body 登录",
+    "nature": "边界",
+    "method": "POST",
+    "endpoint": "/admin/employee/login",
+    "request_data": {},
+    "boundary": "缺 username/password",
+    "expected": "失败或异常",
+    "http_status": 200,
+    "response": {
+      "code": 0,
+      "msg": "账号不存在",
+      "data": null
+    },
+    "elapsed_ms": 4,
+    "pass": true,
+    "note": "实际 code=0, status=200"
+  },
+  {
+    "id": "ADM-AUTH-01",
+    "name": "无 Token 访问员工分页",
+    "nature": "安全/负向",
+    "method": "GET",
+    "endpoint": "/admin/employee/page",
+    "request_data": null,
+    "boundary": "未登录",
+    "expected": "HTTP 401",
+    "http_status": 401,
+    "response": null,
+    "elapsed_ms": 7,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-AUTH-02",
+    "name": "伪造 Token 访问",
+    "nature": "安全/负向",
+    "method": "GET",
+    "endpoint": "/admin/employee/page",
+    "request_data": null,
+    "boundary": "非法 JWT",
+    "expected": "HTTP 401",
+    "http_status": 401,
+    "response": null,
+    "elapsed_ms": 18,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-EMP-01",
+    "name": "员工分页查询",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/employee/page?page=1&pageSize=10",
+    "request_data": {
+      "page": 1,
+      "pageSize": 10
+    },
+    "boundary": "已登录",
+    "expected": "code=1 且 password 脱敏",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "total": 1,
+        "records": [
+          {
+            "id": 1,
+            "username": "admin",
+            "name": "管理员",
+            "password": "****",
+            "phone": "13812312312",
+            "sex": "1",
+            "idNumber": "110101199001010047",
+            "status": 1,
+            "createTime": "2022-02-15 15:51",
+            "updateTime": "2026-08-25 20:38",
+            "createUser": 10,
+            "updateUser": 1
+          }
+        ]
+      }
+    },
+    "elapsed_ms": 61,
+    "pass": true,
+    "note": "脱敏检查=True, sample={'id': 1, 'username': 'admin', 'name': '管理员', 'password': '****', 'phone': '13812312312', 'sex': '1', 'idNumber': '110101199001010047', 'status': 1, 'createTime': '2022-02-15 15:51', 'updateTime': '2026-08-25 20:38', 'createUser': 10, 'updateUser': 1}"
+  },
+  {
+    "id": "ADM-EMP-02",
+    "name": "按 id 查员工",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/employee/1",
+    "request_data": null,
+    "boundary": "存在的 id=1",
+    "expected": "code=1, password=****",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "id": 1,
+        "username": "admin",
+        "name": "管理员",
+        "password": "****",
+        "phone": "13812312312",
+        "sex": "1",
+        "idNumber": "110101199001010047",
+        "status": 1,
+        "createTime": "2022-02-15 15:51",
+        "updateTime": "2026-08-25 20:38",
+        "createUser": 10,
+        "updateUser": 1
+      }
+    },
+    "elapsed_ms": 20,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-EMP-03",
+    "name": "按不存在 id 查员工",
+    "nature": "边界",
+    "method": "GET",
+    "endpoint": "/admin/employee/999999",
+    "request_data": null,
+    "boundary": "不存在 id",
+    "expected": "失败或空/异常",
+    "http_status": 500,
+    "response": {
+      "timestamp": 1787661532380,
+      "status": 500,
+      "error": "Internal Server Error",
+      "path": "/admin/employee/999999"
+    },
+    "elapsed_ms": 15,
+    "pass": true,
+    "note": "response={'timestamp': 1787661532380, 'status': 500, 'error': 'Internal Server Error', 'path': '/admin/employee/999999'}"
+  },
+  {
+    "id": "ADM-CAT-01",
+    "name": "分类分页",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/category/page",
+    "request_data": {
+      "page": 1,
+      "pageSize": 10
+    },
+    "boundary": "正常分页",
+    "expected": "code=1",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "total": 10,
+        "records": [
+          {
+            "id": 16,
+            "type": 1,
+            "name": "蜀味烤鱼",
+            "sort": 4,
+            "status": 1,
+            "createTime": "2022-06-09 22:15",
+            "updateTime": "2022-08-31 14:27",
+            "createUser": 1,
+            "updateUser": 1
+          },
+          {
+            "id": 17,
+            "type": 1,
+            "name": "蜀味牛蛙",
+            "sort": 5,
+            "status": 1,
+            "createTime": "2022-06-09 22:16",
+            "updateTime": "2022-08-31 14:39",
+            "createUser": 1,
+            "updateUser": 1
+          },
+          {
+            "id": 18,
+            "type": 1,
+            "name": "特色蒸菜",
+            "sort": 6,
+            "status": 1,
+            "createTime": "2022-06-09 22:17",
+            "updateTime": "2022-06-09 22:17",
+            "createUser": 1,
+            "updateUser": 1
+          },
+          {
+            "id": 19,
+            "type": 1,
+            "name": "新鲜时蔬",
+            "sort": 7,
+            "status": 1,
+            "createTime": "2022-06-09 22:18",
+            "updateTime": "2022-06-09 22:18",
+            "createUser": 1,
+            "updateUser": 1
+          },
+          {
+            "id": 20,
+            "type": 1,
+            "name": "水煮鱼",
+            "sort": 8,
+            "status": 1,
+            "createTime": "2022-06-09 22:22",
+            "updateTime": "2022-06-09 22:23",
+            "createUser": 1,
+            "updateUser": 1
+          },
+          {
+            "id": 12,
+            "type": 1,
+            "name": "传统主食",
+            "sort": 9,
+            "status": 1,
+            "createTime": "2022-06-09 22:09",
+            "updateTime": "2022-06-09 22:18",
+            "createUser": 1,
+            "updateUser": 1
+          },
+          {
+            "id": 11,
+            "type": 1,
+            "name": "酒水饮料",
+            "sort": 10,
+            "status": 1,
+            "createTime": "2022-06-09 22:09",
+            "updateTime": "2022-06-09 22:09",
+            "createUser": 1,
+            "updateUser": 1
+          },
+          {
+            "id": 21,
+            "type": 1,
+            "name": "汤类",
+            "sort": 11,
+            "status": 1,
+            "createTime": "2022-06-10 10:51",
+            "updateTime": "2022-06-10 10:51",
+            "createUser": 1,
+            "updateUser": 1
+          },
+          {
+            "id": 13,
+            "type": 2,
+            "name": "人气套餐",
+            "sort": 12,
+            "status": 1,
+            "createTime": "2022-06-09 22:11",
+            "updateTime": "2022-06-10 11:04",
+            "createUser": 1,
+            "updateUser": 1
+          },
+          {
+            "id": 15,
+            "type": 2,
+            "name": "商务套餐",
+            "sort": 13,
+            "status": 1,
+            "createTime": "2022-06-09 22:14",
+            "updateTime": "2022-06-10 11:04",
+            "createUser": 1,
+            "updateUser": 1
+          }
+        ]
+      }
+    },
+    "elapsed_ms": 24,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-CAT-02",
+    "name": "按类型查分类 type=1",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/category/list?type=1",
+    "request_data": {
+      "type": 1
+    },
+    "boundary": "菜品分类",
+    "expected": "code=1 且 list",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": [
+        {
+          "id": 16,
+          "type": 1,
+          "name": "蜀味烤鱼",
+          "sort": 4,
+          "status": 1,
+          "createTime": "2022-06-09 22:15",
+          "updateTime": "2022-08-31 14:27",
+          "createUser": 1,
+          "updateUser": 1
+        },
+        {
+          "id": 17,
+          "type": 1,
+          "name": "蜀味牛蛙",
+          "sort": 5,
+          "status": 1,
+          "createTime": "2022-06-09 22:16",
+          "updateTime": "2022-08-31 14:39",
+          "createUser": 1,
+          "updateUser": 1
+        },
+        {
+          "id": 18,
+          "type": 1,
+          "name": "特色蒸菜",
+          "sort": 6,
+          "status": 1,
+          "createTime": "2022-06-09 22:17",
+          "updateTime": "2022-06-09 22:17",
+          "createUser": 1,
+          "updateUser": 1
+        },
+        {
+          "id": 19,
+          "type": 1,
+          "name": "新鲜时蔬",
+          "sort": 7,
+          "status": 1,
+          "createTime": "2022-06-09 22:18",
+          "updateTime": "2022-06-09 22:18",
+          "createUser": 1,
+          "updateUser": 1
+        },
+        {
+          "id": 20,
+          "type": 1,
+          "name": "水煮鱼",
+          "sort": 8,
+          "status": 1,
+          "createTime": "2022-06-09 22:22",
+          "updateTime": "2022-06-09 22:23",
+          "createUser": 1,
+          "updateUser": 1
+        },
+        {
+          "id": 12,
+          "type": 1,
+          "name": "传统主食",
+          "sort": 9,
+          "status": 1,
+          "createTime": "2022-06-09 22:09",
+          "updateTime": "2022-06-09 22:18",
+          "createUser": 1,
+          "updateUser": 1
+        },
+        {
+          "id": 11,
+          "type": 1,
+          "name": "酒水饮料",
+          "sort": 10,
+          "status": 1,
+          "createTime": "2022-06-09 22:09",
+          "updateTime": "2022-06-09 22:09",
+          "createUser": 1,
+          "updateUser": 1
+        },
+        {
+          "id": 21,
+          "type": 1,
+          "name": "汤类",
+          "sort": 11,
+          "status": 1,
+          "createTime": "2022-06-10 10:51",
+          "updateTime": "2022-06-10 10:51",
+          "createUser": 1,
+          "updateUser": 1
+        }
+      ]
+    },
+    "elapsed_ms": 23,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-DISH-01",
+    "name": "菜品分页",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/dish/page",
+    "request_data": {
+      "page": 1,
+      "pageSize": 5
+    },
+    "boundary": "正常",
+    "expected": "code=1",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "total": 24,
+        "records": [
+          {
+            "id": 69,
+            "name": "平菇豆腐汤",
+            "categoryId": 21,
+            "price": 6.0,
+            "image": "https://sky-itcast.oss-cn-beijing.aliyuncs.com/16d0a3d6-2253-4cfc-9b49-bf7bd9eb2ad2.png",
+            "description": "配料：豆腐，平菇",
+            "status": 1,
+            "updateTime": "2022-06-10 10:55",
+            "categoryName": "汤类",
+            "flavors": []
+          },
+          {
+            "id": 68,
+            "name": "鸡蛋汤",
+            "categoryId": 21,
+            "price": 4.0,
+            "image": "https://sky-itcast.oss-cn-beijing.aliyuncs.com/c09a0ee8-9d19-428d-81b9-746221824113.png",
+            "description": "配料：鸡蛋，紫菜",
+            "status": 1,
+            "updateTime": "2022-06-10 10:54",
+            "categoryName": "汤类",
+            "flavors": []
+          },
+          {
+            "id": 67,
+            "name": "鮰鱼2斤",
+            "categoryId": 16,
+            "price": 72.0,
+            "image": "https://sky-itcast.oss-cn-beijing.aliyuncs.com/8cfcc576-4b66-4a09-ac68-ad5b273c2590.png",
+            "description": "原料：鮰鱼，黄豆芽，莲藕",
+            "status": 1,
+            "updateTime": "2022-06-10 10:43",
+            "categoryName": "蜀味烤鱼",
+            "flavors": []
+          },
+          {
+            "id": 66,
+            "name": "江团鱼2斤",
+            "categoryId": 16,
+            "price": 119.0,
+            "image": "https://sky-itcast.oss-cn-beijing.aliyuncs.com/a101a1e9-8f8b-47b2-afa4-1abd47ea0a87.png",
+            "description": "配料：江团鱼，黄豆芽，莲藕",
+            "status": 1,
+            "updateTime": "2022-06-10 10:42",
+            "categoryName": "蜀味烤鱼",
+            "flavors": []
+          },
+          {
+            "id": 65,
+            "name": "草鱼2斤",
+            "categoryId": 16,
+            "price": 68.0,
+            "image": "https://sky-itcast.oss-cn-beijing.aliyuncs.com/b544d3ba-a1ae-4d20-a860-81cb5dec9e03.png",
+            "description": "原料：草鱼，黄豆芽，莲藕",
+            "status": 1,
+            "updateTime": "2022-06-10 10:41",
+            "categoryName": "蜀味烤鱼",
+            "flavors": []
+          }
+        ]
+      }
+    },
+    "elapsed_ms": 58,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-DISH-02",
+    "name": "按 id 查菜品",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/dish/46",
+    "request_data": null,
+    "boundary": "种子菜品 id=46(若库有)",
+    "expected": "code=1 或业务失败",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "id": 46,
+        "name": "王老吉",
+        "categoryId": 11,
+        "price": 6.0,
+        "image": "https://sky-itcast.oss-cn-beijing.aliyuncs.com/41bfcacf-7ad4-4927-8b26-df366553a94c.png",
+        "description": "",
+        "status": 1,
+        "updateTime": "2022-06-09 22:40",
+        "categoryName": null,
+        "flavors": []
+      }
+    },
+    "elapsed_ms": 50,
+    "pass": true,
+    "note": "code=1, msg=None"
+  },
+  {
+    "id": "ADM-SET-01",
+    "name": "套餐分页",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/setmeal/page",
+    "request_data": {
+      "page": 1,
+      "pageSize": 5
+    },
+    "boundary": "正常",
+    "expected": "code=1",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "total": 0,
+        "records": []
+      }
+    },
+    "elapsed_ms": 25,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-SHOP-01",
+    "name": "获取店铺状态",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/shop/status",
+    "request_data": null,
+    "boundary": "已登录",
+    "expected": "code=1",
+    "http_status": 500,
+    "response": {
+      "timestamp": 1787661533013,
+      "status": 500,
+      "error": "Internal Server Error",
+      "path": "/admin/shop/status"
+    },
+    "elapsed_ms": 447,
+    "pass": false,
+    "note": ""
+  },
+  {
+    "id": "ADM-SHOP-02",
+    "name": "设置店铺营业 status=1",
+    "nature": "功能",
+    "method": "PUT",
+    "endpoint": "/admin/shop/1",
+    "request_data": null,
+    "boundary": "status=1 营业",
+    "expected": "code=1",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": null
+    },
+    "elapsed_ms": 10,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-WS-01",
+    "name": "工作台今日数据",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/workspace/businessData",
+    "request_data": null,
+    "boundary": "已登录",
+    "expected": "code=1",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "turnover": 0.0,
+        "validOrderCount": 0,
+        "orderCompletionRate": 0.0,
+        "unitPrice": 0.0,
+        "newUsers": 0
+      }
+    },
+    "elapsed_ms": 39,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-ORD-01",
+    "name": "订单状态统计",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/order/statistics",
+    "request_data": null,
+    "boundary": "已登录",
+    "expected": "code=1",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "toBeConfirmed": 0,
+        "confirmed": 0,
+        "deliveryInProgress": 0
+      }
+    },
+    "elapsed_ms": 24,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-ORD-02",
+    "name": "订单条件搜索",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/order/conditionSearch",
+    "request_data": {
+      "page": 1,
+      "pageSize": 5
+    },
+    "boundary": "分页",
+    "expected": "code=1",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "total": 0,
+        "records": []
+      }
+    },
+    "elapsed_ms": 34,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-ORD-03",
+    "name": "管理端订单详情 id=1",
+    "nature": "功能/边界",
+    "method": "GET",
+    "endpoint": "/admin/order/details/1",
+    "request_data": null,
+    "boundary": "订单可能不存在",
+    "expected": "code=1 或业务错误",
+    "http_status": 200,
+    "response": {
+      "code": 0,
+      "msg": "订单不存在",
+      "data": null
+    },
+    "elapsed_ms": 25,
+    "pass": true,
+    "note": "code=0, msg=订单不存在"
+  },
+  {
+    "id": "ADM-RPT-01",
+    "name": "营业额统计",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/report/turnoverStatistics",
+    "request_data": {
+      "begin": "2026-08-18",
+      "end": "2026-08-25"
+    },
+    "boundary": "近7天",
+    "expected": "code=1",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "dateList": "2026-08-18,2026-08-19,2026-08-20,2026-08-21,2026-08-22,2026-08-23,2026-08-24,2026-08-25",
+        "turnoverList": "0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0"
+      }
+    },
+    "elapsed_ms": 39,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-RPT-02",
+    "name": "用户统计",
+    "nature": "功能",
+    "method": "GET",
+    "endpoint": "/admin/report/userStatistics",
+    "request_data": {
+      "begin": "2026-08-18",
+      "end": "2026-08-25"
+    },
+    "boundary": "近7天",
+    "expected": "code=1",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "dateList": "2026-08-18,2026-08-19,2026-08-20,2026-08-21,2026-08-22,2026-08-23,2026-08-24,2026-08-25",
+        "totalUserList": "0,0,0,0,0,0,0,0",
+        "newUserList": "0,0,0,0,0,0,0,0"
+      }
+    },
+    "elapsed_ms": 29,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-UP-01",
+    "name": "上传非法扩展名 .exe",
+    "nature": "安全/边界",
+    "method": "POST",
+    "endpoint": "/admin/common/upload",
+    "request_data": {
+      "filename": "evil.exe"
+    },
+    "boundary": "非白名单扩展名",
+    "expected": "业务失败 code!=1 提示文件类型",
+    "http_status": 200,
+    "response": {
+      "code": 0,
+      "msg": "不支持的文件类型",
+      "data": null
+    },
+    "elapsed_ms": null,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "USR-SHOP-01",
+    "name": "用户端店铺状态(免登录)",
+    "nature": "功能/安全",
+    "method": "GET",
+    "endpoint": "/user/shop/status",
+    "request_data": null,
+    "boundary": "公开接口",
+    "expected": "HTTP 200 code=1",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": 1
+    },
+    "elapsed_ms": 80,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "USR-AUTH-01",
+    "name": "无 Token 访问分类列表",
+    "nature": "安全/负向",
+    "method": "GET",
+    "endpoint": "/user/category/list",
+    "request_data": null,
+    "boundary": "需登录",
+    "expected": "HTTP 401",
+    "http_status": 401,
+    "response": null,
+    "elapsed_ms": 25,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "USR-AUTH-02",
+    "name": "无 Token 访问菜品列表",
+    "nature": "安全/负向",
+    "method": "GET",
+    "endpoint": "/user/dish/list",
+    "request_data": {
+      "categoryId": 11
+    },
+    "boundary": "需登录",
+    "expected": "HTTP 401",
+    "http_status": 401,
+    "response": null,
+    "elapsed_ms": 15,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "USR-LOGIN-01",
+    "name": "微信登录假 code",
+    "nature": "边界/集成",
+    "method": "POST",
+    "endpoint": "/user/user/login",
+    "request_data": {
+      "code": "fake_wx_code"
+    },
+    "boundary": "无效 code / 未配 appid",
+    "expected": "业务失败",
+    "http_status": 200,
+    "response": {
+      "code": 0,
+      "msg": "登录失败",
+      "data": null
+    },
+    "elapsed_ms": 463,
+    "pass": true,
+    "note": "msg=登录失败"
+  },
+  {
+    "id": "USR-ORD-01",
+    "name": "用户订单详情伪造 token",
+    "nature": "安全",
+    "method": "GET",
+    "endpoint": "/user/order/orderDetail/1",
+    "request_data": null,
+    "boundary": "伪造 authentication",
+    "expected": "HTTP 401",
+    "http_status": 401,
+    "response": null,
+    "elapsed_ms": 3,
+    "pass": true,
+    "note": ""
+  },
+  {
+    "id": "ADM-LOGIN-05",
+    "name": "再次登录(验证BCrypt升级后)",
+    "nature": "回归",
+    "method": "POST",
+    "endpoint": "/admin/employee/login",
+    "request_data": {
+      "username": "admin",
+      "password": "123456"
+    },
+    "boundary": "密码已可能升级为BCrypt",
+    "expected": "仍能 code=1",
+    "http_status": 200,
+    "response": {
+      "code": 1,
+      "msg": null,
+      "data": {
+        "id": 1,
+        "userName": "admin",
+        "name": "管理员",
+        "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBJZCI6MSwiZXhwIjoxNzg3NjY4NzMzfQ.TMvSTTIvSVXoZDuxwIxh_n_5CtTHt2vpwPmbZcCaVQs"
+      }
+    },
+    "elapsed_ms": 78,
+    "pass": true,
+    "note": ""
+  }
+]
