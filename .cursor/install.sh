@@ -16,9 +16,10 @@ sudo apt-get update -qq
 # not support newer JDKs. The compiled jar runs fine on the image default JDK.
 sudo apt-get install -y -qq mysql-server redis-server maven openjdk-11-jdk
 
-echo "==> Starting MySQL (needed to seed the schema during install)"
-sudo service mysql start
-for _ in $(seq 1 30); do sudo mysqladmin ping >/dev/null 2>&1 && break; sleep 1; done
+echo "==> Starting MySQL + Redis (needed to seed the schema during install)"
+# Reuse the robust, poll-based service startup so a cold snapshot-restored
+# disk cannot trip the init script's fixed 30s timeout.
+"$(dirname "${BASH_SOURCE[0]}")/start.sh"
 
 echo "==> Ensuring root MySQL password (matches application-dev config default)"
 if mysql -uroot -p123456 -h 127.0.0.1 -e "SELECT 1" >/dev/null 2>&1; then
