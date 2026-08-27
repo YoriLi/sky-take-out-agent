@@ -10,7 +10,10 @@ import com.sky.agent.skill.ShopSkill;
 import com.sky.agent.skill.WorkspaceSkill;
 import com.sky.agent.sse.AgentEventSink;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersCancelDTO;
+import com.sky.dto.OrdersConfirmDTO;
 import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.dto.OrdersRejectionDTO;
 import com.sky.exception.BaseException;
 import com.sky.service.OrderService;
 import com.sky.service.ReportService;
@@ -28,6 +31,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,6 +66,9 @@ public class AgentChatService {
 
     @Autowired
     private AgentRateLimiter rateLimiter;
+
+    @Autowired
+    private AgentPendingActionStore pendingActionStore;
 
     private volatile OpenAiStreamingChatModel streamingModel;
 
@@ -149,15 +156,36 @@ public class AgentChatService {
     }
 
     /**
-     * 未配置模型密钥时的本地兜底：仅提供只读查询，绝不执行任何写操作（防关键词误触发改状态/关店）。
+     * 未配置模型密钥时的本地兜底：查询直接执行；写操作（接单/拒单/取消/派送/完成/开关店）
+     * 采用二次确认——第一次只登记待确认动作并追问，收到「确认」后才真正调用 Service，
+     * 从根本上避免「能不能别打烊」这类关键词误触发写操作。
      */
     private void localChat(String text, Long empId, AgentEventSink sink) {
         BaseContext.setCurrentId(empId);
         try {
+            // 1. 若存在待确认动作，优先解释为对上一步的确认/放弃
+            AgentPendingActionStore.Pending pending = pendingActionStore.peek(empId);
+            if (pending != null) {
+                if (isConfirm(text)) {
+                    String result = executePending(sink, empId, pendingActionStore.take(empId));
+                    emitText(sink, result);
+                    sink.end();
+                    return;
+                }
+                if (isAbort(text)) {
+                    pendingActionStore.clear(empId);
+                    emitText(sink, "已放弃该操作。");
+                    sink.end();
+                    return;
+                }
+                // 既非确认也非放弃：视为改变主意，清掉旧的待确认，继续解析新输入
+                pendingActionStore.clear(empId);
+            }
+
             String reply;
             if (containsAny(text, "你好", "您好", "你是谁", "你能做什么", "hi", "hello")) {
-                reply = "你好，我是苍穹外卖老板助手。当前未配置 AI 能力，只能为你查询：今日营业额、店铺营业状态、订单总览、按手机号或状态查订单。"
-                        + "接单、打烊等修改类操作需配置环境变量 SKY_AGENT_API_KEY 后才可使用。";
+                reply = "你好，我是苍穹外卖老板助手（本地模式）。可直接查询：今日营业额、店铺营业状态、订单总览、按手机号或状态查订单；"
+                        + "接单、拒单、取消、派送、完成、开关店等修改类操作会先向你二次确认再执行。";
             } else if (containsAny(text, "营业额", "营收", "生意怎么样", "今日数据", "今天数据")) {
                 reply = invokeLocalRead("getTodayBusinessData", sink, empId, () -> {
                     LocalDateTime begin = LocalDateTime.now().with(LocalTime.MIN);
@@ -184,17 +212,145 @@ public class AgentChatService {
                     dto.setStatus(status);
                     return AgentFormat.orders(orderService.conditionSearch(dto));
                 });
-            } else if (containsAny(text, "打烊", "关店", "停止营业", "开始营业", "开门", "设为营业", "开业",
-                    "接单", "拒单", "取消", "派送", "完成订单")) {
-                reply = "本地模式仅支持查询操作。接单、拒单、取消、派送、开关店等修改类操作，需先配置环境变量 SKY_AGENT_API_KEY 启用 AI 能力后才能使用。";
             } else {
-                reply = "当前未配置 AI 能力，我只能查询：今日营业额、店铺营业状态、订单总览、按手机号或状态查订单。试试「今天营业额怎么样」或「查一下待接单的订单」。";
+                // 写意图 → 登记待确认；非写意图 → 帮助文案
+                String confirmPrompt = prepareWriteConfirmation(text, empId);
+                reply = confirmPrompt != null ? confirmPrompt
+                        : "本地模式支持：查询（营业额/店铺状态/订单总览/查订单）以及需二次确认的修改（接单/拒单/取消/派送/完成/开关店）。"
+                        + "试试「今天营业额怎么样」或「接单 1001」。";
             }
             emitText(sink, reply);
             sink.end();
         } finally {
             BaseContext.removeCurrentId();
         }
+    }
+
+    /**
+     * 解析写意图并登记待确认动作，返回给用户的确认追问；若缺少必要参数则返回澄清提示（不登记）；
+     * 非写意图返回 null。所有分支都不会立即执行写操作。
+     */
+    private String prepareWriteConfirmation(String text, Long empId) {
+        if (containsAny(text, "打烊", "关店", "停止营业")) {
+            pendingActionStore.put(empId, "setShopStatus", mapOf("status", 0), () -> {
+                shopService.setStatus(0);
+                return "已更新，店铺已打烊（status=0）";
+            });
+            return "⚠️ 即将将店铺设为【打烊】。确认请回复「确认」，放弃请回复「取消」。";
+        }
+        if (containsAny(text, "开始营业", "开门", "开业", "设为营业")) {
+            pendingActionStore.put(empId, "setShopStatus", mapOf("status", 1), () -> {
+                shopService.setStatus(1);
+                return "已更新，店铺营业中（status=1）";
+            });
+            return "⚠️ 即将将店铺设为【营业】。确认请回复「确认」，放弃请回复「取消」。";
+        }
+
+        Long id = extractId(text);
+        if (containsAny(text, "接单")) {
+            if (id == null) {
+                return "接单需要订单数字 id，例如「接单 1001」。";
+            }
+            final Long orderId = id;
+            pendingActionStore.put(empId, "confirmOrder", mapOf("id", orderId), () -> {
+                OrdersConfirmDTO dto = new OrdersConfirmDTO();
+                dto.setId(orderId);
+                orderService.confirm(dto);
+                return "已接单，订单 id=" + orderId;
+            });
+            return "⚠️ 即将【接单】订单 id=" + orderId + "。确认请回复「确认」，放弃请回复「取消」。";
+        }
+        if (containsAny(text, "派送")) {
+            if (id == null) {
+                return "派送需要订单数字 id，例如「派送 1001」。";
+            }
+            final Long orderId = id;
+            pendingActionStore.put(empId, "deliverOrder", mapOf("id", orderId), () -> {
+                orderService.delivery(orderId);
+                return "已开始派送，订单 id=" + orderId;
+            });
+            return "⚠️ 即将将订单 id=" + orderId + " 置为【派送中】。确认请回复「确认」，放弃请回复「取消」。";
+        }
+        if (containsAny(text, "完成")) {
+            if (id == null) {
+                return "完成订单需要订单数字 id，例如「完成 1001」。";
+            }
+            final Long orderId = id;
+            pendingActionStore.put(empId, "completeOrder", mapOf("id", orderId), () -> {
+                orderService.complete(orderId);
+                return "订单已完成，id=" + orderId;
+            });
+            return "⚠️ 即将将订单 id=" + orderId + " 置为【已完成】。确认请回复「确认」，放弃请回复「取消」。";
+        }
+        if (containsAny(text, "拒单")) {
+            if (id == null) {
+                return "拒单需要订单 id 和原因，例如「拒单 1001 商品售罄」。";
+            }
+            final String reason = extractReason(text, id);
+            if (reason == null) {
+                return "拒单必须填写原因，例如「拒单 " + id + " 商品售罄」。";
+            }
+            final Long orderId = id;
+            pendingActionStore.put(empId, "rejectOrder", mapOf("id", orderId, "reason", reason), () -> {
+                OrdersRejectionDTO dto = new OrdersRejectionDTO();
+                dto.setId(orderId);
+                dto.setRejectionReason(reason);
+                orderService.rejection(dto);
+                return "已拒单，订单 id=" + orderId;
+            });
+            return "⚠️ 即将【拒单】订单 id=" + orderId + "，原因：" + reason + "。确认请回复「确认」，放弃请回复「取消」。";
+        }
+        if (containsAny(text, "取消")) {
+            if (id == null) {
+                return "取消订单需要订单 id 和原因，例如「取消 1001 顾客要求」。";
+            }
+            final String reason = extractReason(text, id);
+            if (reason == null) {
+                return "取消订单必须填写原因，例如「取消 " + id + " 顾客要求」。";
+            }
+            final Long orderId = id;
+            pendingActionStore.put(empId, "cancelOrder", mapOf("id", orderId, "reason", reason), () -> {
+                OrdersCancelDTO dto = new OrdersCancelDTO();
+                dto.setId(orderId);
+                dto.setCancelReason(reason);
+                orderService.cancel(dto);
+                return "已取消，订单 id=" + orderId;
+            });
+            return "⚠️ 即将【取消】订单 id=" + orderId + "，原因：" + reason + "。确认请回复「确认」，放弃请回复「取消」。";
+        }
+        return null;
+    }
+
+    private String executePending(AgentEventSink sink, Long empId, AgentPendingActionStore.Pending pending) {
+        if (pending == null) {
+            return "没有待确认的操作，或已超时失效，请重新发起。";
+        }
+        sink.toolCall(pending.toolName, pending.args);
+        log.info("[agent] tool start name={} empId={} mode=local-confirmed args={}", pending.toolName, empId, pending.args);
+        String result;
+        try {
+            String value = pending.action.run();
+            result = (value == null || value.trim().isEmpty()) ? "操作成功" : value;
+        } catch (BaseException e) {
+            result = "操作失败：" + e.getMessage();
+        } catch (Exception e) {
+            log.error("[agent] local tool {} 执行异常 empId={}", pending.toolName, empId, e);
+            result = "操作失败：系统异常，请稍后重试";
+        }
+        result = truncate(result, 2000);
+        sink.toolResult(pending.toolName, result);
+        log.info("[agent] tool end name={} empId={} mode=local-confirmed result={}", pending.toolName, empId, truncate(result, 200));
+        return result;
+    }
+
+    private boolean isConfirm(String text) {
+        String t = text.trim();
+        return containsAny(t, "确认", "确定", "执行", "是的", "没错")
+                || t.equalsIgnoreCase("yes") || t.equalsIgnoreCase("y") || t.equalsIgnoreCase("ok");
+    }
+
+    private boolean isAbort(String text) {
+        return containsAny(text, "取消", "放弃", "算了", "不用", "不了", "先不", "别");
     }
 
     private String invokeLocalRead(String name, AgentEventSink sink, Long empId, CallableResult body) {
@@ -218,6 +374,42 @@ public class AgentChatService {
 
     private interface CallableResult {
         Object call() throws Exception;
+    }
+
+    private Map<String, Object> mapOf(Object... kv) {
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        if (kv == null) {
+            return map;
+        }
+        for (int i = 0; i + 1 < kv.length; i += 2) {
+            map.put(String.valueOf(kv[i]), kv[i + 1]);
+        }
+        return map;
+    }
+
+    private Long extractId(String text) {
+        Matcher m = Pattern.compile("(?:接单|拒单|取消|派送|完成|订单\\s*id|id)\\s*[:：#=]?\\s*(\\d{1,12})",
+                Pattern.CASE_INSENSITIVE).matcher(text);
+        if (m.find()) {
+            return Long.valueOf(m.group(1));
+        }
+        Matcher only = Pattern.compile("(\\d{1,12})").matcher(text);
+        if (only.find()) {
+            return Long.valueOf(only.group(1));
+        }
+        return null;
+    }
+
+    /**
+     * 提取订单 id 之后的文字作为原因，去掉分隔符与「原因」前缀。
+     */
+    private String extractReason(String text, Long id) {
+        String idStr = String.valueOf(id);
+        int idx = text.indexOf(idStr);
+        String tail = idx >= 0 ? text.substring(idx + idStr.length()) : text;
+        tail = tail.replaceFirst("^[\\s，,。.:：#、]+", "").trim();
+        tail = tail.replaceFirst("^原因[:：]?\\s*", "").trim();
+        return tail.isEmpty() ? null : tail;
     }
 
     /**
