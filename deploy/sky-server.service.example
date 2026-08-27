@@ -1,0 +1,26 @@
+# systemd 单元模板：复制为 /etc/systemd/system/sky-server.service
+# 关键点：EnvironmentFile 把密钥注入 JVM 进程环境，Nginx 完全不参与密钥。
+#
+# 部署步骤：
+#   sudo cp deploy/sky-server.service.example /etc/systemd/system/sky-server.service
+#   sudo mkdir -p /etc/sky-take-out && sudo cp deploy/sky-server.env.example /etc/sky-take-out/sky-server.env
+#   sudo chmod 600 /etc/sky-take-out/sky-server.env   # 仅 root 可读，保护密钥
+#   # 编辑 /etc/sky-take-out/sky-server.env 填真实值
+#   sudo systemctl daemon-reload && sudo systemctl enable --now sky-server
+
+[Unit]
+Description=sky-take-out backend (Spring Boot)
+After=network.target mysql.service redis-server.service
+
+[Service]
+Type=simple
+User=sky
+WorkingDirectory=/opt/sky-take-out
+EnvironmentFile=/etc/sky-take-out/sky-server.env
+ExecStart=/usr/bin/java -jar /opt/sky-take-out/sky-server.jar
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
