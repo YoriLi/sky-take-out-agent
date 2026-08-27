@@ -377,6 +377,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Tool(name = "confirmOrder", value = "商家接单。仅在用户明确给出订单 id 时调用，禁止臆造 id。一般只传 id。")
     public void confirm(@P("接单数据，只需设置 id") OrdersConfirmDTO ordersConfirmDTO) {
+        // 校验订单存在且处于待接单状态，防止把已完成/已取消等订单错误改写
+        Orders orderDB = orderMapper.getById(ordersConfirmDTO.getId());
+        if (orderDB == null || !Orders.TO_BE_CONFIRMED.equals(orderDB.getStatus())) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
         Orders orders = Orders.builder()
                 .id(ordersConfirmDTO.getId())
                 .status(Orders.CONFIRMED)
@@ -432,9 +438,22 @@ public class OrderServiceImpl implements OrderService {
 //        根据id查询订单
         Orders orderDB = orderMapper.getById(ordersCancelDTO.getId());
 
+//        校验订单存在
+        if (orderDB == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+//        已完成/已取消的订单不允许再取消
+        if (Orders.COMPLETED.equals(orderDB.getStatus()) || Orders.CANCELLED.equals(orderDB.getStatus())) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+//        取消必须带原因
+        if (ordersCancelDTO.getCancelReason() == null || ordersCancelDTO.getCancelReason().trim().isEmpty()) {
+            throw new OrderBusinessException("取消订单必须填写取消原因");
+        }
+
 //        支付状态
         Integer payStatus = orderDB.getPayStatus();
-        if (payStatus == 1) {
+        if (Orders.PAID.equals(payStatus)) {
 //            用于已支付，需要退款
             String refund = weChatPayUtil.refund(
                     orderDB.getNumber(),
