@@ -61,4 +61,10 @@ export PATH="$(dirname "$(nvm which "$NODE_MAJOR")"):$PATH"
   rm -rf node_modules/fibers
 )
 
+echo "==> Stopping MySQL so the base image is snapshotted in a clean state"
+# Environment builds snapshot the VM right after install. Leaving MySQL running
+# would capture an unclean datadir that a future boot may fail to start; a clean
+# shutdown here lets start.sh reliably start it from the snapshot.
+sudo service mysql stop || true
+
 echo "==> Install complete."
